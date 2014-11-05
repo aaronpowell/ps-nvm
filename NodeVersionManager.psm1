@@ -20,6 +20,9 @@ function Set-NodeVersion {
     }
 
     $env:Path = "$requestedVersion;$env:Path"
+    $env:NODE_PATH = "$requestedVersion;"
+    npm config set prefix $requestedVersion
+    $env:NODE_PATH += npm root -g
 }
 
 function Install-NodeVersion {
