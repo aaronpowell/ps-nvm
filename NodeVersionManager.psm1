@@ -8,6 +8,7 @@ function Set-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
+        [ValidatePattern('^v\d\.\d{2}\.\d{2}$')]
         $Version
     )
 
@@ -25,6 +26,7 @@ function Install-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
+        [ValidatePattern('^v\d\.\d{2}\.\d{2}$')]
         $Version,
 
         [switch]
@@ -76,6 +78,7 @@ function Remove-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
+        [ValidatePattern('^v\d\.\d{2}\.\d{2}$')]
         $Version
     )
 
