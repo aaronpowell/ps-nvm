@@ -4,10 +4,9 @@ This is a simple PowerShell module for installing and using multiple Node.js and
 
 # Install
 
-Clone this repository or put the two `psm1` somewhere on disk and import the module:
+Clone this repository or put the `psm1` somewhere on disk and import the module:
 
     Import-Module <path to NodeVersionManager.psm1>
-    Import-Module <path to iojsVersionManager.psm1>
 
 # Commands
 
@@ -20,6 +19,8 @@ _Note: Node.js will restrict you to a version number of v#.#.#, where as io.js w
     Install-NodeVersion v0.10.33
 
 This will install the specified Node.js/io.js version. You can also use a `-Force` flag to override an existing install
+
+*Note: the `iojs` command accepts a `-Nightly` flag if you want to install from the nightly download list.*
 
 ## `Remove-NodeVersion <version>`/`Remove-iojsVersion <version>`
 
@@ -38,3 +39,5 @@ Shows a list of what Node.js/io.js versions are available.
     Set-NodeVersion v0.10.33
 
 Makes the specified Node.js/io.js version the currently loaded Node.js/io.js version for your terminal.
+
+*Note: the `iojs` command will alias `iojs` to `node` as well, pass the `-NoAlias` flag if you don't want it aliased.*
