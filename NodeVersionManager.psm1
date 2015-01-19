@@ -122,16 +122,16 @@ function Set-iojsVersion {
     }
 
     $env:Path = "$requestedVersion;$env:Path"
-    $env:IOJS_PATH = "$requestedVersion;"
-    npm config set prefix $requestedVersion
-    $env:IOJS_PATH += npm root -g
 
     if (!$NoAlias) {
         $env:NODE_PATH = "$requestedVersion;"
         $env:NODE_PATH += npm root -g
-
-        Set-Alias -Name 'node' -Value 'iojs'
     }
+
+    $env:IOJS_PATH = "$requestedVersion;"
+    npm config set prefix $requestedVersion
+    $env:IOJS_PATH += npm root -g
+
 }
 
 function Install-iojsVersion {
@@ -147,6 +147,17 @@ function Install-iojsVersion {
         [switch]
         $Nightly
     )
+
+    
+    $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+    if (-Not $isAdmin) {
+        $continue = Read-Host 'You are not running as an admin, it is likely that the installer will fail later trying to create the node symlink. Continue (y/N)?'
+
+        if ($continue -ne 'y') {
+            return
+        }
+    }
 
     $requestedVersion = Join-Path $iojsvmwPath $version
 
@@ -193,6 +204,8 @@ function Install-iojsVersion {
 
     Move-Item (Join-Path (Join-Path $unpackPath 'iojs') '*') -Destination $requestedVersion -Force
     Remove-Item $unpackPath -Recurse -Force
+
+    cmd /c mklink (Join-Path $requestedVersion 'node.exe') (Join-Path $requestedVersion 'iojs.exe')
 }
 
 function Remove-iojsVersion {
