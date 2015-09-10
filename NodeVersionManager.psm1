@@ -8,7 +8,7 @@ function Set-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v\d\.\d{2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version
     )
 
@@ -29,7 +29,7 @@ function Install-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v\d\.\d{2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version,
 
         [switch]
@@ -52,7 +52,12 @@ function Install-NodeVersion {
 
     if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') {
         $msiFile = "node-$version-x64.msi"
-        $nodeUrl = "http://nodejs.org/dist/$version/x64/$msiFile"
+
+        if ($version -match '^v0\.\d{1,2}\.\d{1,2}$') {
+            $nodeUrl = "http://nodejs.org/dist/$version/x64/$msiFile"
+        } else {
+            $nodeUrl = "http://nodejs.org/dist/$version/$msiFile"
+        }
     }
 
     Invoke-WebRequest -Uri $nodeUrl -OutFile (Join-Path $requestedVersion $msiFile)
@@ -81,7 +86,7 @@ function Remove-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v\d\.\d{2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version
     )
 
@@ -107,7 +112,7 @@ function Set-iojsVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        #[ValidatePattern('^v\d\.\d{2}\.\d{2}$')]
+        #[ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version,
 
         [switch]
@@ -138,7 +143,7 @@ function Install-iojsVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        #[ValidatePattern('^v\d\.\d{2}\.\d{2}$')]
+        #[ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version,
 
         [switch]
@@ -212,7 +217,7 @@ function Remove-iojsVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        #[ValidatePattern('^v\d\.\d{2}\.\d{2}$')]
+        #[ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version
     )
 
