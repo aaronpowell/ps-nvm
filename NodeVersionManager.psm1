@@ -33,7 +33,10 @@ function Install-NodeVersion {
         $Version,
 
         [switch]
-        $Force
+        $Force,
+
+        [string]
+        $architecture = $env:PROCESSOR_ARCHITECTURE
     )
 
     $requestedVersion = Join-Path $nvmwPath $version
@@ -50,7 +53,7 @@ function Install-NodeVersion {
     $msiFile = "node-$version-x86.msi"
     $nodeUrl = "http://nodejs.org/dist/$version/$msiFile"
 
-    if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') {
+    if ($architecture -eq 'AMD64') {
         $msiFile = "node-$version-x64.msi"
 
         if ($version -match '^v0\.\d{1,2}\.\d{1,2}$') {
@@ -153,7 +156,7 @@ function Install-iojsVersion {
         $Nightly
     )
 
-    
+
     $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 
     if (-Not $isAdmin) {
