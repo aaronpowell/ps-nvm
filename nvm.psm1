@@ -14,7 +14,7 @@ function Set-NodeVersion {
 
     if ([string]::IsNullOrEmpty($Version)) {
         if (Test-Path .\.nvmrc) {
-            $VersionToUse = Get-Content .\.nvmrc -Raw 
+            $VersionToUse = Get-Content .\.nvmrc -Raw
         }
         else {
             Write-Host "Version not given and no .nvmrc file found in folder"
@@ -86,7 +86,7 @@ function Install-NodeVersion {
         return
     }
 
-    $unpackPath = Join-Path $requestedVersion '.unpack'
+    $unpackPath = Join-Path $requestedVersion '.u'
     if (Test-Path $unpackPath) {
         Remove-Item $unpackPath -Recurse -Force
     }
@@ -215,7 +215,7 @@ function Install-iojsVersion {
         return
     }
 
-    $unpackPath = Join-Path $requestedVersion '.unpack'
+    $unpackPath = Join-Path $requestedVersion '.u'
     if (Test-Path $unpackPath) {
         Remove-Item $unpackPath -Recurse -Force
     }
