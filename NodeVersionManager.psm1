@@ -7,15 +7,30 @@ $nvmwPath = Join-Path $PSScriptRoot 'vs'
 function Set-NodeVersion {
     param(
         [string]
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version
     )
 
-    $requestedVersion = Join-Path $nvmwPath $version
+    if ([string]::IsNullOrEmpty($Version)) {
+        if (Test-Path .\.nvmrc) {
+            $VersionToUse = Get-Content .\.nvmrc -Raw 
+        }
+        else {
+            Write-Host "Version not given and no .nvmrc file found in folder"
+            return
+        }
+    }
+    else {
+        $VersionToUse = $version
+    }
+
+    $VersionToUse = $VersionToUse.replace("`n","").replace("`r","")
+
+    $requestedVersion = Join-Path $nvmwPath $VersionToUse
 
     if (!(Test-Path -Path $requestedVersion)) {
-        Write-Host "Could not find node version $version"
+        Write-Host "Could not find node version $VersionToUse"
         return
     }
 
@@ -23,6 +38,7 @@ function Set-NodeVersion {
     $env:NODE_PATH = "$requestedVersion;"
     npm config set prefix $requestedVersion
     $env:NODE_PATH += npm root -g
+    Write-Host "Switched to node version $VersionToUse"
 }
 
 function Install-NodeVersion {

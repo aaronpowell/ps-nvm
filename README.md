@@ -18,7 +18,7 @@ _Note: Node.js will restrict you to a version number of v#.#.#, where as io.js w
 
     Install-NodeVersion v0.10.33
 
-This will install the specified Node.js/io.js version. You can also use a `-Force` flag to override an existing install
+This will install the specified Node.js/io.js version. You can also use a `-Force` flag to override an existing install. If you do not specify a version, the module searches for a .nvmrc file and reads the version from this file if available.
 
 *Note: the `iojs` command accepts a `-Nightly` flag if you want to install from the nightly download list.*
 
