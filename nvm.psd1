@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'NodeVersionManager.psm1'
+RootModule = 'nvm.psm1'
 
 # Version number of this module.
 ModuleVersion = '1.0'
@@ -67,7 +67,7 @@ FormatsToProcess = @()
 
 # Functions to export from this module
 FunctionsToExport =
-               'Set-NodeVersion Install-NodeVersion Remove-NodeVersion Get-NodeVersions Set-iojsVersion Install-iojsVersion Remove-iojsVersion Get-iojsVersions'
+               @("Set-NodeVersion", "Install-NodeVersion", "Remove-NodeVersion", "Get-NodeVersions", "Set-iojsVersion", "Install-iojsVersion", "Remove-iojsVersion", "Get-iojsVersions")
 
 # Cmdlets to export from this module
 CmdletsToExport = @()
