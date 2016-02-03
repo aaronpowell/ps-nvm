@@ -6,7 +6,7 @@ This is a simple PowerShell module for installing and using multiple Node.js and
 
 Clone this repository or put the `psm1` somewhere on disk and import the module:
 
-    Import-Module <path to NodeVersionManager.psm1>
+    Import-Module <path to nvm.psm1>
 
 # Commands
 
