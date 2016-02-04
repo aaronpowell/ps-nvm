@@ -120,7 +120,11 @@ function Remove-NodeVersion {
 }
 
 function Get-NodeVersions {
-    Get-ChildItem $nvmwPath | %{ $_.Name }
+    if (!(Test-Path -Path $nvmwPath)) {
+        "No Node.js versions have been installed"
+    } else {
+        Get-ChildItem $nvmwPath | %{ $_.Name }
+    }
 }
 
 # Start io.js handling
