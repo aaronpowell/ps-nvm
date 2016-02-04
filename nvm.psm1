@@ -17,7 +17,7 @@ function Set-NodeVersion {
             $VersionToUse = Get-Content .\.nvmrc -Raw
         }
         else {
-            Write-Host "Version not given and no .nvmrc file found in folder"
+            "Version not given and no .nvmrc file found in folder"
             return
         }
     }
@@ -30,7 +30,7 @@ function Set-NodeVersion {
     $requestedVersion = Join-Path $nvmwPath $VersionToUse
 
     if (!(Test-Path -Path $requestedVersion)) {
-        Write-Host "Could not find node version $VersionToUse"
+        "Could not find node version $VersionToUse"
         return
     }
 
@@ -38,7 +38,7 @@ function Set-NodeVersion {
     $env:NODE_PATH = "$requestedVersion;"
     npm config set prefix $requestedVersion
     $env:NODE_PATH += npm root -g
-    Write-Host "Switched to node version $VersionToUse"
+    "Switched to node version $VersionToUse"
 }
 
 function Install-NodeVersion {
@@ -58,7 +58,7 @@ function Install-NodeVersion {
     $requestedVersion = Join-Path $nvmwPath $version
 
     if ((Test-Path -Path $requestedVersion) -And (-Not $force)) {
-        Write-Host "Version $version is already installed, use -Force to reinstall"
+        "Version $version is already installed, use -Force to reinstall"
         return
     }
 
@@ -82,7 +82,7 @@ function Install-NodeVersion {
     Invoke-WebRequest -Uri $nodeUrl -OutFile (Join-Path $requestedVersion $msiFile)
 
     if (-Not (Get-Command msiexec)) {
-        Write-Host "msiexec is not in your path"
+        "msiexec is not in your path"
         return
     }
 
@@ -112,7 +112,7 @@ function Remove-NodeVersion {
     $requestedVersion = Join-Path $nvmwPath $Version
 
     if (!(Test-Path -Path $requestedVersion)) {
-        Write-Host "Could not find node version $Version"
+        "Could not find node version $Version"
         return
     }
 
@@ -141,7 +141,7 @@ function Set-iojsVersion {
     $requestedVersion = Join-Path $iojsvmwPath $version
 
     if (!(Test-Path -Path $requestedVersion)) {
-        Write-Host "Could not find io.js version $version"
+        "Could not find io.js version $version"
         return
     }
 
@@ -192,7 +192,7 @@ function Install-iojsVersion {
     }
 
     if ((Test-Path -Path $requestedVersion) -And (-Not $force)) {
-        Write-Host "Version $version is already installed, use -Force to reinstall"
+        "Version $version is already installed, use -Force to reinstall"
         return
     }
 
@@ -211,7 +211,7 @@ function Install-iojsVersion {
     Invoke-WebRequest -Uri $iojsUrl -OutFile (Join-Path $requestedVersion $msiFile)
 
     if (-Not (Get-Command msiexec)) {
-        Write-Host "msiexec is not in your path"
+        "msiexec is not in your path"
         return
     }
 
@@ -243,7 +243,7 @@ function Remove-iojsVersion {
     $requestedVersion = Join-Path $iojsvmwPath $Version
 
     if (!(Test-Path -Path $requestedVersion)) {
-        Write-Host "Could not find io.js version $Version"
+        "Could not find io.js version $Version"
         return
     }
 
