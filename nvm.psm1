@@ -120,10 +120,34 @@ function Remove-NodeVersion {
 }
 
 function Get-NodeVersions {
-    if (!(Test-Path -Path $nvmwPath)) {
-        "No Node.js versions have been installed"
+    param(
+        [switch]
+        $Remote,
+
+        [string]
+        $Filter
+    )
+
+    if ($Remote) {
+        $versions = Invoke-WebRequest -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json
+
+        if ($Filter) {
+            $versions = $versions | Where-Object { $_.version.Contains($filter) }
+        }
+
+        $versions | Select-Object version
     } else {
-        Get-ChildItem $nvmwPath | %{ $_.Name }
+        if (!(Test-Path -Path $nvmwPath)) {
+            "No Node.js versions have been installed"
+        } else {
+            $versions = Get-ChildItem $nvmwPath | %{ $_.Name }
+
+            if ($Filter) {
+                $versions = $versions | Where-Object { $_.Contains($filter) }
+            }
+
+            $versions
+        }
     }
 }
 
