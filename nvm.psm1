@@ -27,6 +27,16 @@ function Set-NodeVersion {
 
     $VersionToUse = $VersionToUse.replace("`n","").replace("`r","")
 
+    if (!($VersionToUse -match "v\d\.\d{1,2}\.\d{1,2}")) {
+        "Version found is not a full version, using fuzzy matching"
+        $VersionToUse = Get-NodeVersions -Filter $VersionToUse | Select-Object -First 1
+
+        if (!$VersionToUse) {
+            "No version found to fuzzy match against"
+            return
+        }
+    }
+
     $requestedVersion = Join-Path $nvmwPath $VersionToUse
 
     if (!(Test-Path -Path $requestedVersion)) {
@@ -135,7 +145,7 @@ function Get-NodeVersions {
             $versions = $versions | Where-Object { $_.version.Contains($filter) }
         }
 
-        $versions | Select-Object version
+        $versions | Select-Object version | Sort-Object -Descending
     } else {
         if (!(Test-Path -Path $nvmwPath)) {
             "No Node.js versions have been installed"
@@ -146,7 +156,7 @@ function Get-NodeVersions {
                 $versions = $versions | Where-Object { $_.Contains($filter) }
             }
 
-            $versions
+            $versions | Sort-Object -Descending
         }
     }
 }
