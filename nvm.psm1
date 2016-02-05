@@ -8,7 +8,7 @@ function Set-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$false)]
-        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d(\.\d{1,2}){0,2}$')]
         $Version
     )
 
@@ -135,6 +135,8 @@ function Get-NodeVersions {
         $Remote,
 
         [string]
+        [Parameter(Mandatory=$false)]
+        [ValidatePattern('^v\d(\.\d{1,2}){0,2}$')]
         $Filter
     )
 
@@ -145,7 +147,7 @@ function Get-NodeVersions {
             $versions = $versions | Where-Object { $_.version.Contains($filter) }
         }
 
-        $versions | Select-Object version | Sort-Object -Descending
+        $versions | Select-Object version | Sort-Object -Descending -Property version
     } else {
         if (!(Test-Path -Path $nvmwPath)) {
             "No Node.js versions have been installed"
