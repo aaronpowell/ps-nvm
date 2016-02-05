@@ -5,6 +5,23 @@ $ErrorActionPreference = 'Stop'
 $nvmwPath = Join-Path $PSScriptRoot 'vs'
 
 function Set-NodeVersion {
+    <#
+    .Synopsis
+       Set the node.js version for the current session
+    .Description
+       Set's the node.js version that was either provided with the -Version parameter or from using the .nvmrc file in the current working directory.
+    .Parameter $Version
+       A version string for the node.js version you wish to use. Use the format of v#.#.#. This also supports fuzzy matching, so v# will be the latest installed version starting with that major
+    .Example
+       Set based on the .nvmrc
+       Set-NodeVersion
+    .Example
+       Set-NodeVersion v5
+       Set using fuzzy matching
+    .Example
+       Set-NodeVersion v5.0.1
+       Set using explicit version
+    #>
     param(
         [string]
         [Parameter(Mandatory=$false)]
@@ -52,6 +69,24 @@ function Set-NodeVersion {
 }
 
 function Install-NodeVersion {
+    <#
+    .Synopsis
+        Install a version of node.js
+    .Description
+        Download and install the specified version of node.js into the nvm directory. Once installed it can be used with Set-NodeVersion
+    .Parameter $Version
+        The version of node.js to install
+    .Parameter $Force
+        Reinstall an already installed version of node.js
+    .Parameter $architecture
+        The architecture of node.js to install, defaults to $env:PROCESSOR_ARCHITECTURE
+    .Example
+        Install-NodeVersion v5.0.0
+        Install version 5.0.0 of node.js into the module directory
+    .Example
+        Install-NodeVersion v5.0.0 -architecture x86
+        Installs the x86 version even if you're on an x64 machine
+    #>
     param(
         [string]
         [Parameter(Mandatory=$true)]
@@ -112,6 +147,17 @@ function Install-NodeVersion {
 }
 
 function Remove-NodeVersion {
+    <#
+    .Synopsis
+        Removes an installed version of node.js
+    .Description
+        Removes an installed version of node.js along with any installed npm modules
+    .Parameter $Version
+        The full version string of the node.js package to remove
+    .Example
+        Remove-NodeVersion v5.0.0
+        Removes the v5.0.0 version of node.js from the nvm store
+    #>
     param(
         [string]
         [Parameter(Mandatory=$true)]
@@ -130,6 +176,27 @@ function Remove-NodeVersion {
 }
 
 function Get-NodeVersions {
+    <#
+    .Synopsis
+        List local or remote node.js versions
+    .Description
+        Used to show all the node.js versions installed to nvm, using the -Remote option allows you to list versions of node.js available for install. Providing a -Filter parameter can reduce the versions using the pattern, either local or remote versions
+    .Parameter $Remote
+        Indicate whether or not to list local or remote versions
+    .Parameter $Filter
+        A version filter supporting fuzzy filters
+    .Example
+        Get-NodeVersions -Remote -Filter v4.2
+        version
+        -------
+        v4.2.6
+        v4.2.5
+        v4.2.4
+        v4.2.3
+        v4.2.2
+        v4.2.1
+        v4.2.0
+    #>
     param(
         [switch]
         $Remote,
