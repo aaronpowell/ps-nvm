@@ -1,4 +1,4 @@
-﻿#requires -version 3.0
+#requires -version 3.0
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -90,7 +90,7 @@ function Install-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$|^latest$')]
         $Version,
 
         [switch]
@@ -99,6 +99,17 @@ function Install-NodeVersion {
         [string]
         $architecture = $env:PROCESSOR_ARCHITECTURE
     )
+
+    if ($version -match "latest") {
+        $listing = "http://nodejs.org/dist/latest/"
+         $r = (wget -UseBasicParsing $listing).content
+         if ($r -match "node-(v[0-9\.]+).*?\.msi") {
+             $version = $matches[1]
+         }
+         else {
+             throw "failed to retrieve latest version from '$listing'"
+         }
+    }
 
     $requestedVersion = Join-Path $nvmwPath $version
 
