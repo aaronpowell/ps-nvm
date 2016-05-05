@@ -38,3 +38,16 @@ Shows a list of what Node.js versions are available.
     Set-NodeVersion v0.10.33
 
 Makes the specified Node.js version the currently loaded Node.js version for your terminal.
+
+## `Get-NodeInstallLocation`
+
+    Get-NodeInstallLocation
+
+Returns the path where Node.js will be looking for and installing new versions into.
+
+## `Set-NodeInstallLocation`
+
+    Set-NodeInstallLocation -Path C:\temp
+
+Sets the base folder which Node.js versions will be installed into.
+
