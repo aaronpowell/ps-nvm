@@ -27,7 +27,7 @@ CompanyName = 'Aaron Powell'
 Copyright = '(c) 2016 Aaron Powell. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js and io.js versions on Windows.'
+Description = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions on Windows.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '3.0'
@@ -67,7 +67,7 @@ FormatsToProcess = @()
 
 # Functions to export from this module
 FunctionsToExport =
-               @("Set-NodeVersion", "Install-NodeVersion", "Remove-NodeVersion", "Get-NodeVersions", "Set-iojsVersion", "Install-iojsVersion", "Remove-iojsVersion", "Get-iojsVersions")
+               @("Set-NodeVersion", "Install-NodeVersion", "Remove-NodeVersion", "Get-NodeVersions")
 
 # Cmdlets to export from this module
 CmdletsToExport = @()
