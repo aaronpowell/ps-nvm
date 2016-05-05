@@ -2,8 +2,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$nvmwPath = Join-Path $PSScriptRoot 'vs'
-
 function Set-NodeVersion {
     <#
     .Synopsis
@@ -53,6 +51,8 @@ function Set-NodeVersion {
             return
         }
     }
+
+    $nvmwPath = Get-NodeInstallLocation
 
     $requestedVersion = Join-Path $nvmwPath $VersionToUse
 
@@ -110,6 +110,8 @@ function Install-NodeVersion {
              throw "failed to retrieve latest version from '$listing'"
          }
     }
+
+    $nvmwPath = Get-NodeInstallLocation
 
     $requestedVersion = Join-Path $nvmwPath $version
 
@@ -176,6 +178,8 @@ function Remove-NodeVersion {
         $Version
     )
 
+    $nvmwPath = Get-NodeInstallLocation
+
     $requestedVersion = Join-Path $nvmwPath $Version
 
     if (!(Test-Path -Path $requestedVersion)) {
@@ -227,6 +231,8 @@ function Get-NodeVersions {
 
         $versions | Select-Object version | Sort-Object -Descending -Property version
     } else {
+        $nvmwPath = Get-NodeInstallLocation
+
         if (!(Test-Path -Path $nvmwPath)) {
             "No Node.js versions have been installed"
         } else {
@@ -239,4 +245,57 @@ function Get-NodeVersions {
             $versions | Sort-Object -Descending
         }
     }
+}
+
+function Set-NodeInstallLocation {
+    <#
+    .Synopsis
+        Sets the path where node.js versions will be installed into
+    .Description
+        This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
+    .Parameter $Path
+        THe root folder for nvm
+    .Example
+        Set-NodeInstallLocation -Path C:\Temp
+    #>
+    param(
+        [string]
+        [Parameter(Mandatory=$true)]
+        $Path
+    )
+
+    $settings = $null
+    $settingsFile = Join-Path $PSScriptRoot 'settings.json'
+
+    if ((Test-Path $settingsFile) -eq $true) {
+        $settings = Get-Content $settings | ConvertFrom-Json
+    } else {
+        $settings = @{ 'InstallPath' = Get-NodeInstallLocation }
+    }
+
+    $settings.InstallPath = Join-Path $Path '.nvm'
+
+    ConvertTo-Json $settings | Out-File (Join-Path $PSScriptRoot 'settings.json')
+}
+
+function Get-NodeInstallLocation {
+    <#
+    .Synopsis
+        Gets the currnet node.js install path
+    .Description
+        Will return the path that node.js versions will be installed into
+    .Example
+        Get-NodeInstallLocation
+        c:\tmp\.nvm
+    #>
+    $settings = $null
+    $settingsFile = Join-Path $PSScriptRoot 'settings.json'
+
+    if ((Test-Path $settingsFile) -eq $true) {
+        $settings = Get-Content $settingsFile | ConvertFrom-Json
+    } else {
+        $settings = New-Object -TypeName PSObject -Prop @{ InstallPath = (Join-Path $PSScriptRoot 'vs') }
+    }
+
+    $settings.InstallPath
 }
