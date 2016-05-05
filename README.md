@@ -37,4 +37,4 @@ Shows a list of what Node.js versions are available.
 
     Set-NodeVersion v0.10.33
 
-Makes the specified Node.js version the currently loaded Node.js/io.js version for your terminal.
+Makes the specified Node.js version the currently loaded Node.js version for your terminal.
