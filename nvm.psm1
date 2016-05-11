@@ -61,10 +61,22 @@ function Set-NodeVersion {
         return
     }
 
+    # immediately add to the current powershell session path
     $env:Path = "$requestedVersion;$env:Path"
+
+    # also add to the permanent windows path
+    $persistedPaths = @($requestedVersion)
+    [Environment]::GetEnvironmentVariable('Path', 'Machine') -split ';' | % {
+      if (-not($_ -like "$nvmwPath*")) {
+        $persistedPaths += $_
+      }
+    }
+    [Environment]::SetEnvironmentVariable('Path', $persistedPaths -join ';', 'Machine')
+
     $env:NODE_PATH = "$requestedVersion;"
     npm config set prefix $requestedVersion
     $env:NODE_PATH += npm root -g
+
     "Switched to node version $VersionToUse"
 }
 
