@@ -10,6 +10,8 @@ function Set-NodeVersion {
        Set's the node.js version that was either provided with the -Version parameter or from using the .nvmrc file in the current working directory.
     .Parameter $Version
        A version string for the node.js version you wish to use. Use the format of v#.#.#. This also supports fuzzy matching, so v# will be the latest installed version starting with that major
+    .Parameter $Persist
+       If present, this will also set the node.js version to the permanent system path, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell. 
     .Example
        Set based on the .nvmrc
        Set-NodeVersion
@@ -19,12 +21,18 @@ function Set-NodeVersion {
     .Example
        Set-NodeVersion v5.0.1
        Set using explicit version
+    .Example
+       Set-NodeVersion v5.0.1 -Persist
+       Set and persist in permamant system path
     #>
     param(
         [string]
         [Parameter(Mandatory=$false)]
         [ValidatePattern('^v\d(\.\d{1,2}){0,2}$')]
-        $Version
+        $Version,
+        [switch]
+        [Parameter(Mandatory=$false)]
+        $Persist
     )
 
     if ([string]::IsNullOrEmpty($Version)) {
@@ -64,14 +72,16 @@ function Set-NodeVersion {
     # immediately add to the current powershell session path
     $env:Path = "$requestedVersion;$env:Path"
 
-    # also add to the permanent windows path
-    $persistedPaths = @($requestedVersion)
-    [Environment]::GetEnvironmentVariable('Path', 'Machine') -split ';' | % {
-      if (-not($_ -like "$nvmwPath*")) {
-        $persistedPaths += $_
-      }
+    if ($Persist.IsPresent) {
+        # also add to the permanent windows path
+        $persistedPaths = @($requestedVersion)
+        [Environment]::GetEnvironmentVariable('Path', 'Machine') -split ';' | % {
+          if (-not($_ -like "$nvmwPath*")) {
+            $persistedPaths += $_
+          }
+        }
+        [Environment]::SetEnvironmentVariable('Path', $persistedPaths -join ';', 'Machine')
     }
-    [Environment]::SetEnvironmentVariable('Path', $persistedPaths -join ';', 'Machine')
 
     $env:NODE_PATH = "$requestedVersion;"
     npm config set prefix $requestedVersion
