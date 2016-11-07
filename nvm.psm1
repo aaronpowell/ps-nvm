@@ -127,7 +127,7 @@ function Install-NodeVersion {
     )
 
     if ($version -match "latest") {
-        $listing = "http://nodejs.org/dist/latest/"
+        $listing = "https://nodejs.org/dist/latest/"
          $r = (wget -UseBasicParsing $listing).content
          if ($r -match "node-(v[0-9\.]+).*?\.msi") {
              $version = $matches[1]
@@ -151,15 +151,15 @@ function Install-NodeVersion {
     }
 
     $msiFile = "node-$version-x86.msi"
-    $nodeUrl = "http://nodejs.org/dist/$version/$msiFile"
+    $nodeUrl = "https://nodejs.org/dist/$version/$msiFile"
 
     if ($architecture -eq 'AMD64') {
         $msiFile = "node-$version-x64.msi"
 
         if ($version -match '^v0\.\d{1,2}\.\d{1,2}$') {
-            $nodeUrl = "http://nodejs.org/dist/$version/x64/$msiFile"
+            $nodeUrl = "https://nodejs.org/dist/$version/x64/$msiFile"
         } else {
-            $nodeUrl = "http://nodejs.org/dist/$version/$msiFile"
+            $nodeUrl = "https://nodejs.org/dist/$version/$msiFile"
         }
     }
 
