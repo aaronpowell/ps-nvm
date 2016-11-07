@@ -130,6 +130,7 @@ function Install-NodeVersion {
         [string]
         $architecture = $env:PROCESSOR_ARCHITECTURE,
         
+        [Paramater]
         [string]
         $proxy
     )
