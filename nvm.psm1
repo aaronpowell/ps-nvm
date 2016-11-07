@@ -106,12 +106,17 @@ function Install-NodeVersion {
         Reinstall an already installed version of node.js
     .Parameter $architecture
         The architecture of node.js to install, defaults to $env:PROCESSOR_ARCHITECTURE
+    .Parameter $proxy
+        Define HTTP proxy used when downloading an installer
     .Example
         Install-NodeVersion v5.0.0
         Install version 5.0.0 of node.js into the module directory
     .Example
         Install-NodeVersion v5.0.0 -architecture x86
         Installs the x86 version even if you're on an x64 machine
+    .Example
+        Install-NodeVersion v5.0.0 -architecture x86 -proxy http://localhost:3128
+        Installs the x86 version even if you're on an x64 machine using default CNTLM proxy
     #>
     param(
         [string]
@@ -123,7 +128,10 @@ function Install-NodeVersion {
         $Force,
 
         [string]
-        $architecture = $env:PROCESSOR_ARCHITECTURE
+        $architecture = $env:PROCESSOR_ARCHITECTURE,
+        
+        [string]
+        $proxy
     )
 
     if ($version -match "latest") {
@@ -163,7 +171,12 @@ function Install-NodeVersion {
         }
     }
 
-    Invoke-WebRequest -Uri $nodeUrl -OutFile (Join-Path $requestedVersion $msiFile)
+    if ($proxy) {
+        Invoke-WebRequest -Uri $nodeUrl -OutFile (Join-Path $requestedVersion $msiFile) -Proxy $proxy
+    } else {
+        Invoke-WebRequest -Uri $nodeUrl -OutFile (Join-Path $requestedVersion $msiFile)
+    }
+    
 
     if (-Not (Get-Command msiexec)) {
         "msiexec is not in your path"
