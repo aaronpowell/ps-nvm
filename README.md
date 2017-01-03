@@ -2,7 +2,17 @@
 
 This is a simple PowerShell module for installing and using multiple Node.js versions on Windows.
 
-# Install
+# Install via PowerShell Gallery
+
+nvm is available on the [PowerShell Gallery](https://www.powershellgallery.com/) as [nvm](https://www.powershellgallery.com/packages/nvm) and can easily be installed with:
+
+```
+PS> Install-Module -Name nvm
+```
+
+You can then import the module or add it to your profile for auto-importing.
+
+# Installing manually
 
 Clone this repository or put the `psm1` somewhere on disk and import the module:
 
