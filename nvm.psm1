@@ -307,7 +307,7 @@ function Set-NodeInstallLocation {
     $settingsFile = Join-Path $PSScriptRoot 'settings.json'
 
     if ((Test-Path $settingsFile) -eq $true) {
-        $settings = Get-Content $settings | ConvertFrom-Json
+        $settings = Get-Content $settingsFile | ConvertFrom-Json
     } else {
         $settings = @{ 'InstallPath' = Get-NodeInstallLocation }
     }
