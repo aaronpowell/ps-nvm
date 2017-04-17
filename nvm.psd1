@@ -12,7 +12,7 @@
 RootModule = 'nvm.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.4.0'
+ModuleVersion = '1.5.0'
 
 # ID used to uniquely identify this module
 GUID = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
@@ -24,7 +24,7 @@ Author = 'Aaron Powell'
 CompanyName = 'Aaron Powell'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 Aaron Powell. All rights reserved.'
+Copyright = '(c) 2017 Aaron Powell. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions on Windows.'
