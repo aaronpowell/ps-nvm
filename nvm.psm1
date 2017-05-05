@@ -190,8 +190,9 @@ function Install-NodeVersion {
 
     New-Item $unpackPath -ItemType Directory
 
-    $args = @("/a", (Join-Path $requestedVersion $msiFile), "/qb", "TARGETDIR=`"$unpackPath`"")
-
+    $msiFilePath = (Join-Path $requestedVersion $msiFile)
+    $args = @("/a", "`"$msiFilePath`"", "/qb", "TARGETDIR=`"$unpackPath`"")
+    
     Start-Process -FilePath "msiexec.exe" -Wait -PassThru -ArgumentList $args
 
     Move-Item (Join-Path (Join-Path $unpackPath 'nodejs') '*') -Destination $requestedVersion -Force
