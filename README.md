@@ -1,6 +1,6 @@
 # Node Version Manager for Windows
 
-This is a simple PowerShell module for installing and using multiple Node.js versions on Windows.
+This is a simple PowerShell module for installing and using multiple Node.js versions on Windows. This is inspired by [creationix's nvm](https://github.com/creationix/nvm) tool for bash.
 
 # Install via PowerShell Gallery
 
@@ -20,7 +20,7 @@ Clone this repository or put the `psm1` somewhere on disk and import the module:
 
 # Commands
 
-There are 4 PowerShell commands exposed.
+There are 6 PowerShell commands exposed. You're best using `Get-Help <command>` for proper help, but here's a quick overview.
 
 _Note: Node.js will restrict you to a version number of v#.#.#_
 
@@ -48,6 +48,8 @@ Shows a list of what Node.js versions are available.
     Set-NodeVersion v0.10.33
 
 Makes the specified Node.js version the currently loaded Node.js version for your terminal.
+
+If you omit the `version` argument it will search for a `.nvmrc` file in the current directory and use that as the version.
 
 ## `Get-NodeInstallLocation`
 
