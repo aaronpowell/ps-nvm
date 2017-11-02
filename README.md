@@ -1,6 +1,7 @@
-# Node Version Manager for Windows
+# Node Version Manager for PowerShell
 
-This is a simple PowerShell module for installing and using multiple Node.js versions on Windows. This is inspired by [creationix's nvm](https://github.com/creationix/nvm) tool for bash.
+This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell. This is inspired by [creationix's nvm](https://github.com/creationix/nvm) tool for bash.
+Works on Windows and on macOS.
 
 # Install via PowerShell Gallery
 

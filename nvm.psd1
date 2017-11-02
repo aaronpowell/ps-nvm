@@ -27,7 +27,7 @@ CompanyName = 'Aaron Powell'
 Copyright = '(c) 2017 Aaron Powell. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions on Windows.'
+Description = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '3.0'
