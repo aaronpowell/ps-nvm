@@ -3,7 +3,7 @@ image: Visual Studio 2017
 build: off
 install:
     - ps: |
-        Install-Module Pester -Scope CurrentUser
+        Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
 test_script:
     - ps: |
         $testResultsFile = ".\TestsResults.xml"
