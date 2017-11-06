@@ -210,7 +210,7 @@ function Install-NodeVersion {
             throw "msiexec is not in your path"
         }
 
-        $args = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"")
+        $args = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"", '/quiet')
 
         Start-Process -FilePath "msiexec.exe" -Wait -PassThru -ArgumentList $args
 

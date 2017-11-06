@@ -1,0 +1,32 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "Run Pester",
+        "type": "shell",
+        "command": "Invoke-Pester",
+        "args": [
+            "-PesterOption",
+            "@{IncludeVSCodeMarker=$true}"
+        ],
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        },
+        "problemMatcher": [{
+            "fileLocation": "absolute",
+            "pattern": [{
+                    "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+                    "message": 1
+                },
+                {
+                    "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+                    "file": 1,
+                    "line": 2
+                }
+            ]
+        }]
+
+    }]
+}
