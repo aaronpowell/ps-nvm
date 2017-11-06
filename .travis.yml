@@ -1,0 +1,11 @@
+os:
+  - osx
+
+install:
+    - ps: |
+        Install-Module -Name Pester -Force
+
+test_script:
+    - ps: |
+        Import-Module Pester
+        Invoke-Pester
