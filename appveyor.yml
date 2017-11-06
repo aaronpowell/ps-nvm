@@ -6,6 +6,7 @@ install:
         Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
 test_script:
     - ps: |
+        $PSVersionTable
         $testResultsFile = ".\TestsResults.xml"
         $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
         (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
