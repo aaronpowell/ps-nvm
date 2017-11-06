@@ -1,5 +1,8 @@
 version: 1.6.{build}
 build: off
+install:
+    - ps: |
+        Install-Module Pester -Scope CurrentUser
 test_script:
     - ps: |
         $testResultsFile = ".\TestsResults.xml"
