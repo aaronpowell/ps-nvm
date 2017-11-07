@@ -93,14 +93,23 @@ Describe "Install-NodeVersion" {
                 $versions = Get-NodeVersions -Filter 'v9.0.0'
                 $versions | Should -Be 'v9.0.0'
             }
+
+            It "Throws when version already exists" {
+                { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
+            }
+
+            It "Won't throw when version already exists if you use the -Force flag" {
+                { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
+            }
         }
 
         Context "Installing with a keyword" {
             It "Installs under the `latest` flag" {
                 Install-NodeVersion -Version 'latest'
-    
+
                 $versions = Get-NodeVersions
-                $versions.GetType() | Should -Be [string]
+                Write-Host $versions.GetType()
+                $versions.GetType() | Should -Be string
             }
         }
     }
@@ -111,8 +120,6 @@ Describe "Install-NodeVersion" {
 
     AfterEach {
         $settingsFile = Join-Path $PSScriptRoot 'settings.json'
-
-        Write-Host $settingsFile
 
         if ((Test-Path $settingsFile) -eq $true) {
             Remove-Item -Force $settingsFile
