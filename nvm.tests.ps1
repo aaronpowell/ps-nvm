@@ -133,7 +133,7 @@ Describe "Set-NodeVersion" {
                 $nodeVersion = 'v9.0.0'
 
                 It "Will set from the .nvmrc file" {
-                    Mock Test-Path { return $true }
+                    Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('variable') -eq $false }
                     Mock Get-Content { return $nodeVersion }
                     Mock Get-NodeInstallLocation { return 'C:\tmp\.nvm' }
 

@@ -3,10 +3,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function IsMac() {
-    if (Test-Path variable:global:IsMacOS) {
-        return $IsMacOS
-    }
-    return $false
+    return (Test-Path variable:global:IsMacOS) -and $IsMacOS
 }
 
 function IsLinux() {
