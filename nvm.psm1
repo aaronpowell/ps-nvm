@@ -2,6 +2,21 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function IsMac() {
+    if (Test-Path variable:global:IsMacOS) {
+        return $IsMacOS
+    }
+    return $false
+}
+
+function IsLinux() {
+    return (Test-Path variable:global:IsLinux) -and $IsLinux
+}
+
+function IsWindows() {
+    return (Test-Path variable:global:IsWindows) -and $IsWindows
+}
+
 function Set-NodeVersion {
     <#
     .Synopsis
@@ -67,7 +82,7 @@ function Set-NodeVersion {
     $nvmwPath = Get-NodeInstallLocation
 
     $requestedVersion = Join-Path $nvmwPath $VersionToUse
-    $binPath = if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+    $binPath = if (IsMac) {
         # Under macOS, the node binary is in a bin folder
         Join-Path $requestedVersion "bin"
     } else {
@@ -164,11 +179,11 @@ function Install-NodeVersion {
 
     New-Item $requestedVersion -ItemType 'Directory' | Out-Null
 
-    if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+    if (IsMac) {
         # Download .tar.gz for macOS
         $file = "node-$version-darwin-$architecture.tar.gz"
         $nodeUrl = "https://nodejs.org/dist/$version/$file"
-    } elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+    } elseif (IsWindows) {
         $file = "node-$version-x86.msi"
         $nodeUrl = "https://nodejs.org/dist/$version/$file"
 
@@ -197,14 +212,14 @@ function Install-NodeVersion {
     $unpackPath = Join-Path $requestedVersion '.u'
     New-Item $unpackPath -ItemType Directory | Out-Null
 
-    if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+    if (IsMac) {
 
         # Extract .tar.gz
         tar -zxf $outFile --directory $unpackPath --strip=1
         Remove-Item -Force $outFile
         Move-Item (Join-Path $unpackPath '*') -Destination $requestedVersion -Force
 
-    } elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+    } elseif (IsWindows) {
 
         if (-Not (Get-Command msiexec)) {
             throw "msiexec is not in your path"
