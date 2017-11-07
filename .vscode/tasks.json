@@ -28,5 +28,27 @@
             ]
         }]
 
+    }, {
+        "label": "Run Pester (inc Integration Tests)",
+        "type": "shell",
+        "command": "$env:include_integration_tests=$true;Invoke-Pester",
+        "args": [
+            "-PesterOption",
+            "@{IncludeVSCodeMarker=$true}"
+        ],
+        "problemMatcher": [{
+            "fileLocation": "absolute",
+            "pattern": [{
+                    "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+                    "message": 1
+                },
+                {
+                    "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+                    "file": 1,
+                    "line": 2
+                }
+            ]
+        }]
+
     }]
 }

@@ -87,24 +87,24 @@ Describe "Get-NodeInstallLocation" {
 Describe "Install-NodeVersion" {
     InModuleScope nvm {
         Context "Installing with a specific version" {
-            It "Install a requested version" {
+            It "Install a requested version" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'v9.0.0'
     
                 $versions = Get-NodeVersions -Filter 'v9.0.0'
                 $versions | Should -Be 'v9.0.0'
             }
 
-            It "Throws when version already exists" {
+            It "Throws when version already exists" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
             }
 
-            It "Won't throw when version already exists if you use the -Force flag" {
+            It "Won't throw when version already exists if you use the -Force flag" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
             }
         }
 
         Context "Installing with a keyword" {
-            It "Installs under the `latest` flag" {
+            It "Installs under the `latest` flag" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'latest'
 
                 $versions = Get-NodeVersions
