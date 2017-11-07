@@ -108,7 +108,6 @@ Describe "Install-NodeVersion" {
                 Install-NodeVersion -Version 'latest'
 
                 $versions = Get-NodeVersions
-                Write-Host $versions.GetType()
                 $versions.GetType() | Should -Be string
             }
         }
@@ -118,6 +117,59 @@ Describe "Install-NodeVersion" {
         Set-NodeInstallLocation -Path $TestDrive
     }
 
+    AfterEach {
+        $settingsFile = Join-Path $PSScriptRoot 'settings.json'
+
+        if ((Test-Path $settingsFile) -eq $true) {
+            Remove-Item -Force $settingsFile
+        }
+    }
+}
+
+Describe "Set-NodeVersion" {
+    InModuleScope nvm {
+        Context "unit tests" {
+            Context "auto-discovery" {
+                $nodeVersion = 'v9.0.0'
+
+                It "Will set from the .nvmrc file" {
+                    Mock Test-Path { return $true }
+                    Mock Get-Content { return $nodeVersion }
+                    Mock Get-NodeInstallLocation { return 'C:\tmp\.nvm' }
+
+                    $response = Set-NodeVersion
+                    $response | Should -Be "Switched to node version $nodeVersion"
+                }
+            }
+
+            Context "Set from version string" {
+                $nodeVersion = 'v9.0.0'
+
+                It "Will set from the supplied version" {
+                    $response = Set-NodeVersion $nodeVersion
+                    $response | Should -Be "Switched to node version $nodeVersion"
+                }
+
+                It "Will set from a fuzzy-matched version" {
+                    Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
+
+                    $response = Set-NodeVersion 'v9'
+                    $response | Should -Be @('Version found is not a full version, using fuzzy matching', "Switched to node version $nodeVersion")
+                }
+
+                It "Will return error on unmatched fuzzy version" {
+                    Mock Get-NodeVersions { return @() }
+
+                    $response = Set-NodeVersion 'v7'
+                    $response | Should -Be @('Version found is not a full version, using fuzzy matching', 'No version found to fuzzy match against')
+                }
+
+                BeforeEach {
+                    Mock Get-NodeInstallLocation { return 'C:\tmp\.nvm' }
+                }
+            }
+        }
+    }
     AfterEach {
         $settingsFile = Join-Path $PSScriptRoot 'settings.json'
 
