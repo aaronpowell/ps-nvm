@@ -166,6 +166,7 @@ Describe "Set-NodeVersion" {
 
                 BeforeEach {
                     Mock Get-NodeInstallLocation { return 'C:\tmp\.nvm' }
+                    Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('C:\tmp\.nvm') -eq $true }
                 }
             }
         }
