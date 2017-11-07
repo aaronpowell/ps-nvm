@@ -101,6 +101,28 @@ Describe "Install-NodeVersion" {
             It "Won't throw when version already exists if you use the -Force flag" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
             }
+
+            It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
+            }
+        }
+
+        Context "Major version installing" {
+            It "Can install from just a major version" -Skip:($env:include_integration_tests -ne $true) {
+                Install-NodeVersion -Version '9'
+
+                $versions = Get-NodeVersions -Filter 'v9'
+                $versions | Should -Match 'v9'
+            }
+        }
+
+        Context "Major and minor version installing" {
+            It "Can install from just a major and minor version" -Skip:($env:include_integration_tests -ne $true) {
+                Install-NodeVersion -Version '9.0'
+
+                $versions = Get-NodeVersions -Filter 'v9.0'
+                $versions | Should -Match 'v9.0'
+            }
         }
 
         Context "Installing with a keyword" {

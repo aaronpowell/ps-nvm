@@ -11,6 +11,12 @@ function IsLinux() {
 }
 
 function IsWindows() {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        # PowerShell less than v6 didn't work on anything other than Windows
+        # This means we can shortcut out here
+        return $true;
+    }
+
     return (Test-Path variable:global:IsWindows) -and $IsWindows
 }
 
@@ -137,7 +143,7 @@ function Install-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$|^latest$')]
+        [ValidatePattern('^v{0,1}\d(\.\d{1,2}){0,2}$|^latest$')]
         $Version,
 
         [switch]
@@ -160,6 +166,13 @@ function Install-NodeVersion {
         } else {
             throw "failed to retrieve latest version from '$listing'"
         }
+    } elseif ($version.StartsWith('v') -ne $true) {
+        $version = "v$version"
+    }
+
+    if (!($version -match "v\d\.\d{1,2}\.\d{1,2}")) {
+        $matchedVersions = Get-NodeVersions -Filter $version -Remote | Select-Object -First 1
+        $Version = $matchedVersions.version
     }
 
     $nvmwPath = Get-NodeInstallLocation
@@ -291,7 +304,7 @@ function Get-NodeVersions {
 
         [string]
         [Parameter(Mandatory=$false)]
-        [ValidatePattern('^v\d(\.\d{1,2}){0,2}$')]
+        [ValidatePattern('^v{0,1}\d(\.\d{1,2}){0,2}$')]
         $Filter
     )
 
