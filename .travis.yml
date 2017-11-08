@@ -18,7 +18,7 @@ install:
   - git clone --branch PSCore_compatibility_clean --depth 1 https://github.com/it-praktyk/Pester.git $HOME/Pester
   - pwsh -c "
       Invoke-WebRequest
-      -Uri https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1
+      -Uri 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1'
       -OutFile $env:HOME/CodeCovIo.psm1
     "
 

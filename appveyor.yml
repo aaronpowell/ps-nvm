@@ -9,7 +9,7 @@ environment:
 install:
   - ps: |
       Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
-      $uri = https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1
+      $uri = 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1'
       Invoke-WebRequest -Uri $uri -OutFile $env:USERPROFILE\CodeCovIo.psm1
 
 build: off
