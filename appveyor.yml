@@ -2,11 +2,14 @@
 version: '1.6.{build}'
 image: Visual Studio 2017
 clone_depth: 1
+skip_tags: true
+skip_branch_with_pr: true
 
 environment:
   include_integration_tests: true
 
 install:
+  # Download script helper to convert Pester coverage into coverage JSON format for codecov
   - ps: |
       Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
       $uri = 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1'
@@ -15,6 +18,7 @@ install:
 build: off
 
 test_script:
+  # Run tests, upload test results and generate coverage report
   - ps: |
       Import-Module $env:USERPROFILE\CodeCovIo.psm1
       $testResultsFile = ".\TestsResults.xml"
