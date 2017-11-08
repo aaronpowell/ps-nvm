@@ -1,13 +1,15 @@
-language: csharp
 
-os:
-  - osx
+os: osx
+osx_image: xcode9.1
+
+before_install:
+  # Fix ruby error https://github.com/Homebrew/brew/issues/3299
+  - brew update
+  - brew tap caskroom/cask
+  - brew cask install powershell
 
 install:
-    - ps: |
-        Install-Module -Name Pester -Force
+  - pwsh -c "Install-Module -Name Pester -Force"
 
-test_script:
-    - ps: |
-        Import-Module Pester
-        Invoke-Pester
+script:
+  - pwsh -c "Import-Module Pester; Invoke-Pester -EnableExit"

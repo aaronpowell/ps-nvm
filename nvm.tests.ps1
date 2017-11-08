@@ -12,12 +12,12 @@ Describe "Get-NodeVersions" {
                     $ret += @{ Name = 'v9.0.0' }
                     return $ret
                 }
-    
+
                 $versions = Get-NodeVersions
                 $versions.Count | Should -Be 2
                 $versions | Should -Be @('v9.0.0'; 'v8.9.0')
             }
-    
+
             It "Gets known versions with filter" {
                 Mock Get-NodeInstallLocation { 'C:\tmp\.nvm\settings.json' }
                 Mock Test-Path { return $true }
@@ -27,16 +27,16 @@ Describe "Get-NodeVersions" {
                     $ret += @{ Name = 'v9.0.0' }
                     return $ret
                 }
-    
+
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
                 $versions | Should -Be 'v8.9.0'
-    
+
             }
-    
+
             It "Returns an error message when no versions are installed" {
                 Mock Get-NodeInstallLocation { 'C:\tmp\.nvm\settings.json' }
                 Mock Test-Path { return $false }
-    
+
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
                 $versions | Should -Be 'No Node.js versions have been installed'
             }
@@ -89,7 +89,7 @@ Describe "Install-NodeVersion" {
         Context "Installing with a specific version" {
             It "Install a requested version" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'v9.0.0'
-    
+
                 $versions = Get-NodeVersions -Filter 'v9.0.0'
                 $versions | Should -Be 'v9.0.0'
             }
