@@ -18,4 +18,7 @@ install:
   - git clone --branch PSCore_compatibility_clean --depth 1 https://github.com/it-praktyk/Pester.git $HOME/Pester
 
 script:
-  - pwsh -c "Import-Module $HOME/Pester/Pester.psm1; Invoke-Pester -EnableExit"
+  - pwsh -c "Import-Module $HOME/Pester/Pester.psm1; Invoke-Pester -EnableExit -CodeCoverage nvm.psm1 -CodeCoverageOutputFile coverage.xml"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f coverage.xml

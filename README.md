@@ -2,6 +2,7 @@
 
 [![powershellgallery](https://img.shields.io/powershellgallery/v/nvm.svg)](https://www.powershellgallery.com/packages/nvm)
 [![downloads](https://img.shields.io/powershellgallery/dt/nvm.svg?label=downloads)](https://www.powershellgallery.com/packages/nvm)
+[![codecov](https://codecov.io/gh/aaronpowell/ps-nvmw/branch/master/graph/badge.svg)](https://codecov.io/gh/aaronpowell/ps-nvmw)
 
 | Operating System | Build Status |
 | ---------------- | ------------ |
