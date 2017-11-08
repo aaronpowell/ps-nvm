@@ -9,7 +9,9 @@ before_install:
   - brew cask install powershell
 
 install:
-  - pwsh -c "Install-Module -Name Pester -Force"
+  # PR to add macOS support to Pester
+  # https://github.com/pester/Pester/pull/925
+  - git clone --branch PSCore_compatibility_clean --depth 1 git@github.com:it-praktyk/Pester.git
 
 script:
-  - pwsh -c "Import-Module Pester; Invoke-Pester -EnableExit"
+  - pwsh -c "Import-Module ./Pester/Pester.psm1; Invoke-Pester -EnableExit"
