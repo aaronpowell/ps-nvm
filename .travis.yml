@@ -17,14 +17,14 @@ install:
   # https://github.com/pester/Pester/pull/925
   - git clone --branch PSCore_compatibility_clean --depth 1 https://github.com/it-praktyk/Pester.git $HOME/Pester
   # Download script helper to convert Pester coverage into coverage JSON format for codecov
-  - pwsh -c "
+  - pwsh -c "{
       $uri = 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1';
       Invoke-WebRequest -Uri $uri -OutFile $env:HOME/CodeCovIo.psm1
-    "
+    }"
 
 script:
   # Run tests and generate coverage report
-  - pwsh -c "
+  - pwsh -c "{
       Import-Module $env:HOME/Pester/Pester.psm1;
       Import-Module $env:HOME/CodeCovIo.psm1;
       $res = Invoke-Pester -CodeCoverage nvm.psm1;
@@ -32,7 +32,7 @@ script:
       if ($res.FailedCount -gt 0) {
         throw "$($res.FailedCount) tests failed."
       }
-    "
+    }"
 
 after_success:
   # Upload coverage report to codecov
