@@ -2,6 +2,24 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function IsMac() {
+    return (Test-Path variable:global:IsMacOS) -and $IsMacOS
+}
+
+function IsLinux() {
+    return (Test-Path variable:global:IsLinux) -and $IsLinux
+}
+
+function IsWindows() {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        # PowerShell less than v6 didn't work on anything other than Windows
+        # This means we can shortcut out here
+        return $true;
+    }
+
+    return (Test-Path variable:global:IsWindows) -and $IsWindows
+}
+
 function Set-NodeVersion {
     <#
     .Synopsis
@@ -67,7 +85,7 @@ function Set-NodeVersion {
     $nvmwPath = Get-NodeInstallLocation
 
     $requestedVersion = Join-Path $nvmwPath $VersionToUse
-    $binPath = if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+    $binPath = if (IsMac) {
         # Under macOS, the node binary is in a bin folder
         Join-Path $requestedVersion "bin"
     } else {
@@ -125,18 +143,27 @@ function Install-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$|^latest$')]
+        [ValidatePattern('^v{0,1}\d(\.\d{1,2}){0,2}$|^latest$')]
         $Version,
 
         [switch]
         $Force,
 
         [string]
-        $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture,
+        [ValidateSet('Arm', 'Arm64', 'X64', 'X86', 'AMD64')]
+        $Architecture,
 
         [string]
         $Proxy
     )
+
+    if ([string]::IsNullOrEmpty($Architecture)) {
+        if (IsWindows) {
+            $Architecture = $env:PROCESSOR_ARCHITECTURE
+        } else {
+            $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        }
+    }
 
     $Architecture = $architecture.ToLower()
 
@@ -148,6 +175,13 @@ function Install-NodeVersion {
         } else {
             throw "failed to retrieve latest version from '$listing'"
         }
+    } elseif ($version.StartsWith('v') -ne $true) {
+        $version = "v$version"
+    }
+
+    if (!($version -match "v\d\.\d{1,2}\.\d{1,2}")) {
+        $matchedVersions = Get-NodeVersions -Filter $version -Remote | Select-Object -First 1
+        $Version = $matchedVersions.version
     }
 
     $nvmwPath = Get-NodeInstallLocation
@@ -164,11 +198,11 @@ function Install-NodeVersion {
 
     New-Item $requestedVersion -ItemType 'Directory' | Out-Null
 
-    if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+    if (IsMac) {
         # Download .tar.gz for macOS
         $file = "node-$version-darwin-$architecture.tar.gz"
         $nodeUrl = "https://nodejs.org/dist/$version/$file"
-    } elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+    } elseif (IsWindows) {
         $file = "node-$version-x86.msi"
         $nodeUrl = "https://nodejs.org/dist/$version/$file"
 
@@ -197,20 +231,20 @@ function Install-NodeVersion {
     $unpackPath = Join-Path $requestedVersion '.u'
     New-Item $unpackPath -ItemType Directory | Out-Null
 
-    if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+    if (IsMac) {
 
         # Extract .tar.gz
         tar -zxf $outFile --directory $unpackPath --strip=1
         Remove-Item -Force $outFile
         Move-Item (Join-Path $unpackPath '*') -Destination $requestedVersion -Force
 
-    } elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+    } elseif (IsWindows) {
 
         if (-Not (Get-Command msiexec)) {
             throw "msiexec is not in your path"
         }
 
-        $args = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"")
+        $args = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"", '/quiet')
 
         Start-Process -FilePath "msiexec.exe" -Wait -PassThru -ArgumentList $args
 
@@ -279,7 +313,7 @@ function Get-NodeVersions {
 
         [string]
         [Parameter(Mandatory=$false)]
-        [ValidatePattern('^v\d(\.\d{1,2}){0,2}$')]
+        [ValidatePattern('^v{0,1}\d(\.\d{1,2}){0,2}$')]
         $Filter
     )
 
