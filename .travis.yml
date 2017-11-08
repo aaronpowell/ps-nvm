@@ -20,9 +20,24 @@ install:
   # PR to add macOS support to Pester
   # https://github.com/pester/Pester/pull/925
   - git clone --branch PSCore_compatibility_clean --depth 1 https://github.com/it-praktyk/Pester.git $HOME/Pester
+  # Download script helper to convert Pester coverage into coverage JSON format for codecov
+  - pwsh -c "{
+      $uri = 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1';
+      Invoke-WebRequest -Uri $uri -OutFile $env:HOME/CodeCovIo.psm1
+    }"
 
 script:
-  - pwsh -c "Import-Module $HOME/Pester/Pester.psm1; Invoke-Pester -EnableExit -CodeCoverage nvm.psm1 -CodeCoverageOutputFile coverage.xml"
+  # Run tests and generate coverage report
+  - pwsh -c "{
+      Import-Module $env:HOME/Pester/Pester.psm1;
+      Import-Module $env:HOME/CodeCovIo.psm1;
+      $res = Invoke-Pester -CodeCoverage nvm.psm1;
+      Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json;
+      if ($res.FailedCount -gt 0) {
+        throw "$($res.FailedCount) tests failed."
+      }
+    }"
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -f coverage.xml
+  # Upload coverage report to codecov
+  - bash <(curl -s https://codecov.io/bash) -f coverage.json

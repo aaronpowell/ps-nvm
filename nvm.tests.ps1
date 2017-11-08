@@ -100,6 +100,7 @@ Describe "Install-NodeVersion" {
             }
 
             It "Throws when version already exists" -Skip:($env:include_integration_tests -ne $true) {
+                Install-NodeVersion -Version 'v9.0.0'
                 { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
             }
 
@@ -141,10 +142,13 @@ Describe "Install-NodeVersion" {
     }
 
     BeforeEach {
-        Set-NodeInstallLocation -Path $TestDrive
+        $installLocation = Join-Path ([system.io.path]::GetTempPath()) '.nvm'
+        Set-NodeInstallLocation -Path $installLocation
     }
 
     AfterEach {
+        Remove-Item -Recurse -Force $installLocation
+
         $settingsFile = Join-Path $PSScriptRoot 'settings.json'
 
         if ((Test-Path $settingsFile) -eq $true) {
