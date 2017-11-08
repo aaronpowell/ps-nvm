@@ -4,7 +4,7 @@ Describe "Get-NodeVersions" {
     InModuleScope nvm {
         Context "Local versions" {
             It "Gets known versions" {
-                Mock Get-NodeInstallLocation { 'C:\tmp\.nvm\settings.json' }
+                Mock Get-NodeInstallLocation { "$([system.io.path]::GetTempPath())\.nvm\settings.json" }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
                     $ret = @()
@@ -19,7 +19,7 @@ Describe "Get-NodeVersions" {
             }
 
             It "Gets known versions with filter" {
-                Mock Get-NodeInstallLocation { 'C:\tmp\.nvm\settings.json' }
+                Mock Get-NodeInstallLocation { "$([system.io.path]::GetTempPath())\.nvm\settings.json" }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
                     $ret = @()
@@ -34,7 +34,7 @@ Describe "Get-NodeVersions" {
             }
 
             It "Returns an error message when no versions are installed" {
-                Mock Get-NodeInstallLocation { 'C:\tmp\.nvm\settings.json' }
+                Mock Get-NodeInstallLocation { "$([system.io.path]::GetTempPath())\.nvm\settings.json" }
                 Mock Test-Path { return $false }
 
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
@@ -76,10 +76,10 @@ Describe "Get-NodeInstallLocation" {
     InModuleScope nvm {
         It "Should return the location when it exists" {
             Mock Test-Path { return $true }
-            Mock Get-Content { return '{ "InstallPath": "c:\\tmp\\.nvm" }' }
+            Mock Get-Content { return @{ InstallPath = "$([system.io.path]::GetTempPath())\.nvm" } | ConvertTo-Json }
 
             $location = Get-NodeInstallLocation
-            $location | Should -Be 'c:\tmp\.nvm'
+            $location | Should -Be "$([system.io.path]::GetTempPath())\.nvm"
         }
     }
 }
@@ -156,7 +156,7 @@ Describe "Set-NodeVersion" {
             It "Will set from the .nvmrc file" {
                 Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('variable') -eq $false }
                 Mock Get-Content { return $nodeVersion }
-                Mock Get-NodeInstallLocation { return 'C:\tmp\.nvm' }
+                Mock Get-NodeInstallLocation { return "$([system.io.path]::GetTempPath())\.nvm" }
 
                 $response = Set-NodeVersion
                 $response | Should -Be "Switched to node version $nodeVersion"
@@ -186,8 +186,8 @@ Describe "Set-NodeVersion" {
             }
 
             BeforeEach {
-                Mock Get-NodeInstallLocation { return 'C:\tmp\.nvm' }
-                Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('C:\tmp\.nvm') -eq $true }
+                Mock Get-NodeInstallLocation { return "$([system.io.path]::GetTempPath())\.nvm" }
+                Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith("$([system.io.path]::GetTempPath())\.nvm") -eq $true }
             }
         }
     }
