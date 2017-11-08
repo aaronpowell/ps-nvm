@@ -15,7 +15,7 @@ before_install:
 install:
   # PR to add macOS support to Pester
   # https://github.com/pester/Pester/pull/925
-  - git clone --branch PSCore_compatibility_clean --depth 1 https://github.com/it-praktyk/Pester.git
+  - git clone --branch PSCore_compatibility_clean --depth 1 https://github.com/it-praktyk/Pester.git $HOME/Pester
 
 script:
-  - pwsh -c "Import-Module ./Pester/Pester.psm1; Invoke-Pester -EnableExit"
+  - pwsh -c "Import-Module $HOME/Pester/Pester.psm1; Invoke-Pester -EnableExit"
