@@ -4,7 +4,8 @@ Describe "Get-NodeVersions" {
     InModuleScope nvm {
         Context "Local versions" {
             It "Gets known versions" {
-                Mock Get-NodeInstallLocation { "$([system.io.path]::GetTempPath())\.nvm\settings.json" }
+                $tmpDir = [system.io.path]::GetTempPath()
+                Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
                     $ret = @()
@@ -19,7 +20,8 @@ Describe "Get-NodeVersions" {
             }
 
             It "Gets known versions with filter" {
-                Mock Get-NodeInstallLocation { "$([system.io.path]::GetTempPath())\.nvm\settings.json" }
+                $tmpDir = [system.io.path]::GetTempPath()
+                Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
                     $ret = @()
@@ -34,7 +36,8 @@ Describe "Get-NodeVersions" {
             }
 
             It "Returns an error message when no versions are installed" {
-                Mock Get-NodeInstallLocation { "$([system.io.path]::GetTempPath())\.nvm\settings.json" }
+                $tmpDir = [system.io.path]::GetTempPath()
+                Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $false }
 
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
@@ -75,11 +78,13 @@ Describe "Get-NodeVersions" {
 Describe "Get-NodeInstallLocation" {
     InModuleScope nvm {
         It "Should return the location when it exists" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            $installPath = Join-Path $tmpDir '.nvm'
             Mock Test-Path { return $true }
-            Mock Get-Content { return @{ InstallPath = "$([system.io.path]::GetTempPath())\.nvm" } | ConvertTo-Json }
+            Mock Get-Content { return @{ InstallPath = $installPath } | ConvertTo-Json }
 
             $location = Get-NodeInstallLocation
-            $location | Should -Be "$([system.io.path]::GetTempPath())\.nvm"
+            $location | Should -Be $installPath
         }
     }
 }
@@ -154,9 +159,10 @@ Describe "Set-NodeVersion" {
             $nodeVersion = 'v9.0.0'
 
             It "Will set from the .nvmrc file" {
+                $tmpDir = [system.io.path]::GetTempPath()
                 Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('variable') -eq $false }
                 Mock Get-Content { return $nodeVersion }
-                Mock Get-NodeInstallLocation { return "$([system.io.path]::GetTempPath())\.nvm" }
+                Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
 
                 $response = Set-NodeVersion
                 $response | Should -Be "Switched to node version $nodeVersion"
@@ -186,8 +192,9 @@ Describe "Set-NodeVersion" {
             }
 
             BeforeEach {
-                Mock Get-NodeInstallLocation { return "$([system.io.path]::GetTempPath())\.nvm" }
-                Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith("$([system.io.path]::GetTempPath())\.nvm") -eq $true }
+                $tmpDir = [system.io.path]::GetTempPath()
+                Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
+                Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith((Join-Path $tmpDir '.nvm')) -eq $true }
             }
         }
     }
