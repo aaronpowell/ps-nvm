@@ -2,6 +2,10 @@
 os: osx
 osx_image: xcode9.1
 
+cache:
+  directories:
+    - $HOME/Library/Caches/Homebrew
+
 before_install:
   # Fix ruby error https://github.com/Homebrew/brew/issues/3299
   - brew update
