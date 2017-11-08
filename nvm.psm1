@@ -150,11 +150,20 @@ function Install-NodeVersion {
         $Force,
 
         [string]
-        $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture,
+        [ValidateSet('Arm', 'Arm64', 'X64', 'X86', 'AMD64')]
+        $Architecture,
 
         [string]
         $Proxy
     )
+
+    if ([string]::IsNullOrEmpty($Architecture)) {
+        if (IsWindows) {
+            $Architecture = $env:PROCESSOR_ARCHITECTURE
+        } else {
+            $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        }
+    }
 
     $Architecture = $architecture.ToLower()
 
