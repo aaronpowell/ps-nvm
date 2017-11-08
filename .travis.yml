@@ -2,6 +2,10 @@
 os: osx
 osx_image: xcode9.1
 
+env:
+  global:
+    include_integration_tests=true
+
 cache:
   directories:
     - $HOME/Library/Caches/Homebrew
