@@ -1,5 +1,7 @@
 
-os: osx
+os:
+  - osx
+  - linux
 osx_image: xcode9.1
 
 env:
@@ -11,10 +13,7 @@ cache:
     - $HOME/Library/Caches/Homebrew
 
 before_install:
-  # Fix ruby error https://github.com/Homebrew/brew/issues/3299
-  - brew update
-  - brew tap caskroom/cask
-  - brew cask install powershell
+  - bash ./.build-scripts/setup-build-env.sh
 
 install:
   # PR to add macOS support to Pester
