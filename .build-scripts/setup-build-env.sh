@@ -1,13 +1,13 @@
 #! /bin/sh
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+if [[ $TRAVIS_OS_NAME == "osx" ]]; then
     # Fix ruby error https://github.com/Homebrew/brew/issues/3299
     brew update
     brew tap caskroom/cask
     brew cask install powershell
 fi
 
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     # Import the public repository GPG keys
     curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
