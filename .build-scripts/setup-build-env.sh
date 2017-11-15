@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
     # Fix ruby error https://github.com/Homebrew/brew/issues/3299
