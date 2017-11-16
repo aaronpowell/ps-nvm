@@ -32,10 +32,10 @@ matrix:
 install:
   - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
   # Download script helper to convert Pester coverage into coverage JSON format for codecov
-  - pwsh -c "& {
-      $uri = 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1';
+  - pwsh -c '& {
+      $uri = "https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1";
       Invoke-WebRequest -Uri $uri -OutFile ~/CodeCovIo.psm1
-    }"
+    }'
 
 script:
   # Run tests and generate coverage report
