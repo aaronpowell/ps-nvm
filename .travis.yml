@@ -35,7 +35,7 @@ install:
 script:
   # Run tests and generate coverage report
   - pwsh -c '& {
-      Import-Module ./CodeCovIo.psm1;
+      Import-Module ./.scripts/CodeCovIo.psm1;
       $res = Invoke-Pester -PassThru -CodeCoverage nvm.psm1;
       Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json;
       if ($res.FailedCount -gt 0) {
