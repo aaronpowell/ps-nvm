@@ -34,7 +34,7 @@ install:
   # Download script helper to convert Pester coverage into coverage JSON format for codecov
   - pwsh -c "{
       $uri = 'https://raw.githubusercontent.com/PowerShell/DscResource.Tests/491688867dc53894b92ca53520a18d145deb7760/DscResource.CodeCoverage/CodeCovIo.psm1';
-      Invoke-WebRequest -Uri $uri -OutFile $env:HOME/CodeCovIo.psm1
+      Invoke-WebRequest -Uri $uri -OutFile ~/CodeCovIo.psm1
     }"
 
 script:
@@ -43,5 +43,5 @@ script:
 
 after_success:
   # Upload coverage report to codecov
-  - pwsh -c 'Import-Module $env:HOME/CodeCovIo.psm1; Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json'
+  - pwsh -c 'Import-Module ~/CodeCovIo.psm1; Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json'
   - bash <(curl -s https://codecov.io/bash) -f coverage.json
