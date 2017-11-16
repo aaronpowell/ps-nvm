@@ -85,7 +85,7 @@ function Set-NodeVersion {
     $nvmwPath = Get-NodeInstallLocation
 
     $requestedVersion = Join-Path $nvmwPath $VersionToUse
-    $binPath = if (IsMac) {
+    $binPath = if ((IsMac) -or (IsLinux)) {
         # Under macOS, the node binary is in a bin folder
         Join-Path $requestedVersion "bin"
     } else {
@@ -215,7 +215,9 @@ function Install-NodeVersion {
                 $nodeUrl = "https://nodejs.org/dist/$version/$file"
             }
         }
-
+    } elseif (IsLinux) {
+        $file = "node-$version-linux-$architecture.tar.gz"
+        $nodeUrl = "https://nodejs.org/dist/$version/$file"
     } else {
         throw "Unsupported OS Platform: $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription)"
     }
@@ -231,15 +233,12 @@ function Install-NodeVersion {
     $unpackPath = Join-Path $requestedVersion '.u'
     New-Item $unpackPath -ItemType Directory | Out-Null
 
-    if (IsMac) {
-
+    if ((IsMac) -or (IsLinux)) {
         # Extract .tar.gz
         tar -zxf $outFile --directory $unpackPath --strip=1
         Remove-Item -Force $outFile
         Move-Item (Join-Path $unpackPath '*') -Destination $requestedVersion -Force
-
     } elseif (IsWindows) {
-
         if (-Not (Get-Command msiexec)) {
             throw "msiexec is not in your path"
         }
