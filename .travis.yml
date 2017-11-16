@@ -41,7 +41,7 @@ script:
   # Run tests and generate coverage report
   - pwsh -c '& {
       Import-Module ~/CodeCovIo.psm1;
-      $res = Invoke-Pester -CodeCoverage nvm.psm1;
+      $res = Invoke-Pester -PassThru -CodeCoverage nvm.psm1;
       Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json;
       if ($res.FailedCount -gt 0) {
         throw "$($res.FailedCount) tests failed."
