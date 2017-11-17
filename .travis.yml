@@ -17,7 +17,11 @@ matrix:
         - brew update
         - brew tap caskroom/cask
         - brew cask install powershell
+        - brew install nuget
     - os: linux
+      # Includes NuGet
+      language: csharp
+      dotnet: '2.0.0'
       dist: trusty
       # VM-based builds turned out to be faster
       sudo: required
@@ -28,9 +32,13 @@ matrix:
               key_url: https://packages.microsoft.com/keys/microsoft.asc
           packages:
             - powershell
+      before_script:
+        # Print version
+        - nuget help
 
 install:
   - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
+  - nuget install
 
 script:
   # Run tests and generate coverage report

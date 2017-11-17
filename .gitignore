@@ -3,3 +3,4 @@ vs-iojs
 settings.json
 *.orig
 coverage*
+packages/
