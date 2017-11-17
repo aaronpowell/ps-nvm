@@ -10,7 +10,7 @@ environment:
 
 install:
   - ps: Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
-  - dotnet publish --no-restore -o .
+  - dotnet publish -o .
 
 build: off
 
