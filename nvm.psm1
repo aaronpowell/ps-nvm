@@ -75,7 +75,12 @@ function Set-NodeVersion {
 
     $Version = $Version.Trim()
 
-    $matchedVersion = Get-NodeVersions -Filter $Version | Select-Object -First 1
+    $matchedVersion = if (!($Version -match "v\d\.\d{1,2}\.\d{1,2}")) {
+        Get-NodeVersions -Filter $Version | Select-Object -First 1
+    }
+    else {
+        $Version
+    }
 
     if (!$matchedVersion) {
         throw "No version found that matches $Version"
@@ -302,7 +307,7 @@ function Get-NodeVersions {
         A semver version range to filter versions
     .Example
         Get-NodeVersions -Filter '>=7.0.0 <9.0.0'
-        
+
         Major      : 8
         Minor      : 9
         Patch      : 1
@@ -316,12 +321,12 @@ function Get-NodeVersions {
         Build      :
     .Example
         Get-NodeVersions -Filter '>=7.0.0 <9.0.0' | % {"$_"}
-        
+
         v8.9.1
         v7.9.0
     .Example
         (Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)
-        
+
         True
     #>
     param(
@@ -333,20 +338,18 @@ function Get-NodeVersions {
         $Filter
     )
 
-    $range = New-Object SemVer.Range $Filter
-
-    if ($Remote) {
-        $versions = Invoke-WebRequest -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json | ForEach-Object { New-Object SemVer.Version $_.version }
-
+    $range = [SemVer.Range]::new($Filter)
+    $versions = if ($Remote) {
+        Invoke-WebRequest -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json | ForEach-Object { $_.version } | ForEach-Object { [SemVer.Version]::new($_, $true) }
     }
     else {
         $nvmwPath = Get-NodeInstallLocation
 
         if (!(Test-Path -Path $nvmwPath)) {
-            "No Node.js versions have been installed"
+            throw "No Node.js versions have been installed"
         }
         else {
-            $versions = Get-ChildItem $nvmwPath | ForEach-Object { New-Object SemVer.Version $_.Name }
+            Get-ChildItem $nvmwPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
 
