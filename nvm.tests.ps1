@@ -136,7 +136,7 @@ Describe "Install-NodeVersion" {
                 Install-NodeVersion -Version 'latest'
 
                 $versions = Get-NodeVersions
-                $versions.GetType() | Should -Be string
+                $versions.GetType() | Should -Be 'SemVer.Version'
             }
         }
     }

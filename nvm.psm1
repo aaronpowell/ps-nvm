@@ -205,27 +205,27 @@ function Install-NodeVersion {
 
     if (IsMac) {
         # Download .tar.gz for macOS
-        $file = "node-$version-darwin-$architecture.tar.gz"
-        $nodeUrl = "https://nodejs.org/dist/$version/$file"
+        $file = "node-$matchedVersion-darwin-$architecture.tar.gz"
+        $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
     }
     elseif (IsWindows) {
-        $file = "node-$version-x86.msi"
-        $nodeUrl = "https://nodejs.org/dist/$version/$file"
+        $file = "node-$matchedVersion-x86.msi"
+        $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
 
         if ($architecture -eq 'amd64') {
-            $file = "node-$version-x64.msi"
+            $file = "node-$matchedVersion-x64.msi"
 
-            if ($version -match '^v0\.\d{1,2}\.\d{1,2}$') {
-                $nodeUrl = "https://nodejs.org/dist/$version/x64/$file"
+            if ($matchedVersion -match '^v0\.\d{1,2}\.\d{1,2}$') {
+                $nodeUrl = "https://nodejs.org/dist/$matchedVersion/x64/$file"
             }
             else {
-                $nodeUrl = "https://nodejs.org/dist/$version/$file"
+                $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
             }
         }
     }
     elseif (IsLinux) {
-        $file = "node-$version-linux-$architecture.tar.gz"
-        $nodeUrl = "https://nodejs.org/dist/$version/$file"
+        $file = "node-$matchedVersion-linux-$architecture.tar.gz"
+        $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
     }
     else {
         throw "Unsupported OS Platform: $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription)"
