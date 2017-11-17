@@ -10,10 +10,9 @@ environment:
 
 install:
   - ps: Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
-  - dotnet restore
-
-build:
   - dotnet publish --no-restore -o .
+
+build: off
 
 test_script:
   # Run tests, upload test results and generate coverage report

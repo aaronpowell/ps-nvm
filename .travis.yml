@@ -32,10 +32,9 @@ matrix:
 
 install:
   - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
-  - dotnet restore
+  - dotnet publish -o .
 
 script:
-  - dotnet publish --no-restore -o .
   # Run tests and generate coverage report
   - pwsh -c '& {
       Import-Module ./.scripts/CodeCovIo.psm1;

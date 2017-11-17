@@ -10,17 +10,4 @@
     <PackageReference Include="SemanticVersioning" Version="[1.0.0,2.0.0)" />
   </ItemGroup>
 
-  <!-- <Target Name="AddGeneratedContentItems" BeforeTargets="AssignTargetPaths" DependsOnTargets="PrepareForPublish">
-    <ItemGroup>
-      <Content Include="nvm.psd1" CopyToPublishDirectory="PreserveNewest" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);@(Content)" />
-    </ItemGroup>
-  </Target> -->
-  <ItemGroup>
-    <DistFiles Include="src\**" />
-    <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-      <RelativePath>%(DistFiles.Identity)</RelativePath>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </ResolvedFileToPublish>
-  </ItemGroup>
-
 </Project>
