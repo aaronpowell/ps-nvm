@@ -27,13 +27,13 @@ function Set-NodeVersion {
     .Synopsis
        Set the node.js version for the current session
     .Description
-       Set's the node.js version that was either provided with the -Version parameter or from using the .nvmrc file in the current working directory.
+       Set's the node.js version that was either provided with the -Version parameter, from using the .nvmrc file or the node engines field in package.json in the current working directory.
     .Parameter $Version
        A semver version range for the node.js version you wish to use.
     .Parameter $Persist
        If present, this will also set the node.js version to the permanent system path, of the specified scope, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell.
     .Example
-       Set based on the .nvmrc
+       Set based on the .nvmrc or package.json engines node field
        Set-NodeVersion
     .Example
        Set-NodeVersion 5.0.1
@@ -65,11 +65,21 @@ function Set-NodeVersion {
     )
 
     if ([string]::IsNullOrEmpty($Version)) {
-        if (Test-Path .\.nvmrc) {
-            $Version = Get-Content .\.nvmrc -Raw
+        if (Test-Path ./.nvmrc) {
+            $Version = Get-Content ./.nvmrc -Raw
+        }
+        elseif (Test-Path ./package.json) {
+            $packageJson = Get-Content ./package.json -Raw | ConvertFrom-Json
+            if ((Get-Member -InputObject $packageJson.engines -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
+                # Use node engine field as version range
+                $Version = $packageJson.engines.node
+            }
+            else {
+                throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
+            }
         }
         else {
-            throw "Version not given and no .nvmrc file found in folder"
+            throw "Version not given and no .nvmrc or package.json found in folder"
         }
     }
 
