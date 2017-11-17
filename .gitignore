@@ -3,4 +3,8 @@ vs-iojs
 settings.json
 *.orig
 coverage*
-packages/
+obj/
+bin/
+*.dll
+*.pdb
+*.deps.json

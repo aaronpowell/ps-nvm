@@ -32,15 +32,13 @@ matrix:
               key_url: https://packages.microsoft.com/keys/microsoft.asc
           packages:
             - powershell
-      before_script:
-        # Print version
-        - nuget help
 
 install:
   - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
-  - nuget install
+  - dotnet restore
 
 script:
+  - dotnet publish --no-restore -o .
   # Run tests and generate coverage report
   - pwsh -c '& {
       Import-Module ./.scripts/CodeCovIo.psm1;
