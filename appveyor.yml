@@ -9,6 +9,7 @@ environment:
   include_integration_tests: true
 
 install:
+  - dotnet publish -o .
   - ps: Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
 
 build: off

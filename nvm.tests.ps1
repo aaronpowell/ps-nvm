@@ -35,13 +35,13 @@ Describe "Get-NodeVersions" {
 
             }
 
-            It "Returns an error message when no versions are installed" {
-                $tmpDir = [system.io.path]::GetTempPath()
-                Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
-                Mock Test-Path { return $false }
-
-                $versions = Get-NodeVersions -Filter 'v8.9.0'
-                $versions | Should -Be 'No Node.js versions have been installed'
+            It "Throws an error when no versions are installed" {
+                {
+                    $tmpDir = [system.io.path]::GetTempPath()
+                    Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
+                    Mock Test-Path { return $false }
+                    Get-NodeVersions -Filter 'v8.9.0'
+                } | Should -Throw 'No Node.js versions have been installed'
             }
         }
 
@@ -136,7 +136,7 @@ Describe "Install-NodeVersion" {
                 Install-NodeVersion -Version 'latest'
 
                 $versions = Get-NodeVersions
-                $versions.GetType() | Should -Be string
+                $versions.GetType() | Should -Be 'SemVer.Version'
             }
         }
     }
@@ -181,18 +181,26 @@ Describe "Set-NodeVersion" {
                 $response | Should -Be "Switched to node version $nodeVersion"
             }
 
-            It "Will set from a fuzzy-matched version" {
+            It "Will set from a version range" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
                 $response = Set-NodeVersion 'v9'
-                $response | Should -Be @('Version found is not a full version, using fuzzy matching', "Switched to node version $nodeVersion")
+                $response | Should -Be "Switched to node version $nodeVersion"
             }
 
-            It "Will return error on unmatched fuzzy version" {
-                Mock Get-NodeVersions { return @() }
+            It "Will set from a version range with caret" {
+                Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion 'v7'
-                $response | Should -Be @('Version found is not a full version, using fuzzy matching', 'No version found to fuzzy match against')
+                $response = Set-NodeVersion '^9.0.0'
+                $response | Should -Be "Switched to node version $nodeVersion"
+            }
+
+            It "Will throw error on unmatched version range" {
+                {
+                    Mock Get-NodeVersions { return @() }
+
+                    Set-NodeVersion 'v7'
+                } | Should -Throw "No version found that matches v7"
             }
 
             BeforeEach {

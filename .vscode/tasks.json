@@ -1,54 +1,94 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [{
-        "label": "Run Pester",
-        "type": "shell",
-        "command": "Invoke-Pester",
-        "args": [
-            "-PesterOption",
-            "@{IncludeVSCodeMarker=$true}"
-        ],
-        "group": {
-            "kind": "test",
-            "isDefault": true
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install dependencies",
+      "identifier": "publish",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["publish", "-o", "."],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Pester",
+      "dependsOn": "publish",
+      "type": "shell",
+      "command": "Invoke-Pester",
+      "args": ["-PesterOption", "@{IncludeVSCodeMarker=$true}"],
+      "options": {
+        "shell": {
+          "executable": "pwsh",
+          "args": ["-c"]
+        }
+      },
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "powershell.exe"
+          }
+        }
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        {
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+              "message": 1
+            },
+            {
+              "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+              "file": 1,
+              "line": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Run Pester (inc Integration Tests)",
+      "dependsOn": "publish",
+      "type": "shell",
+      "command": "Invoke-Pester",
+      "args": ["-PesterOption", "@{IncludeVSCodeMarker=$true}"],
+      "options": {
+        "env": {
+          "include_integration_tests": "true"
         },
-        "problemMatcher": [{
-            "fileLocation": "absolute",
-            "pattern": [{
-                    "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
-                    "message": 1
-                },
-                {
-                    "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
-                    "file": 1,
-                    "line": 2
-                }
-            ]
-        }]
-
-    }, {
-        "label": "Run Pester (inc Integration Tests)",
-        "type": "shell",
-        "command": "$env:include_integration_tests=$true;Invoke-Pester",
-        "args": [
-            "-PesterOption",
-            "@{IncludeVSCodeMarker=$true}"
-        ],
-        "problemMatcher": [{
-            "fileLocation": "absolute",
-            "pattern": [{
-                    "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
-                    "message": 1
-                },
-                {
-                    "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
-                    "file": 1,
-                    "line": 2
-                }
-            ]
-        }]
-
-    }]
+        "shell": {
+          "executable": "pwsh",
+          "args": ["-c"]
+        }
+      },
+      "windows": {
+        "options": {
+          "shell": {
+            "executable": "powershell.exe"
+          }
+        }
+      },
+      "problemMatcher": [
+        {
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+              "message": 1
+            },
+            {
+              "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+              "file": 1,
+              "line": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SemanticVersioning" Version="[1.0.0,2.0.0)" />
+  </ItemGroup>
+
+  <Target Name="CleanUp" AfterTargets="Publish">
+    <Delete Files="ps-nvmw.pdb" />
+    <Delete Files="ps-nvmw.deps.json" />
+    <Delete Files="ps-nvmw.dll" />
+    <RemoveDir Directories="bin" />
+    <RemoveDir Directories="obj" />
+  </Target>
+
+</Project>
