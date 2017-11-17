@@ -16,8 +16,8 @@ matrix:
       before_install:
         - brew update
         - brew tap caskroom/cask
+        - brew cask install dotnet
         - brew cask install powershell
-        - brew install nuget
     - os: linux
       # Includes NuGet
       language: csharp
