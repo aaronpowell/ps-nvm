@@ -1,5 +1,6 @@
 
-language: generic
+language: csharp
+dotnet: '2.0.0'
 
 env:
   global:
@@ -16,12 +17,8 @@ matrix:
       before_install:
         - brew update
         - brew tap caskroom/cask
-        - brew cask install dotnet
         - brew cask install powershell
     - os: linux
-      # Includes NuGet
-      language: csharp
-      dotnet: '2.0.0'
       dist: trusty
       # VM-based builds turned out to be faster
       sudo: required
@@ -38,7 +35,7 @@ install:
   - dotnet restore
 
 script:
-  - dotnet publish --no-restore -o .
+  - dotnet publish --no-restore -o ./target
   # Run tests and generate coverage report
   - pwsh -c '& {
       Import-Module ./.scripts/CodeCovIo.psm1;
