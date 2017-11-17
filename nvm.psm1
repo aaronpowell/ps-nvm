@@ -82,9 +82,9 @@ function Set-NodeVersion {
         }
     }
 
-    $nvmwPath = Get-NodeInstallLocation
+    $nvmPath = Get-NodeInstallLocation
 
-    $requestedVersion = Join-Path $nvmwPath $VersionToUse
+    $requestedVersion = Join-Path $nvmPath $VersionToUse
     $binPath = if ((IsMac) -or (IsLinux)) {
         # Under macOS, the node binary is in a bin folder
         Join-Path $requestedVersion "bin"
@@ -106,7 +106,7 @@ function Set-NodeVersion {
         # also add to the permanent windows path
         $persistedPaths = @($requestedVersion)
         [Environment]::GetEnvironmentVariable('PATH', $Persist) -split [System.IO.Path]::PathSeparator | ForEach-Object {
-            if (-not($_ -like "$nvmwPath*")) {
+            if (-not($_ -like "$nvmPath*")) {
                 $persistedPaths += $_
             }
         }
@@ -184,9 +184,9 @@ function Install-NodeVersion {
         $Version = $matchedVersions.version
     }
 
-    $nvmwPath = Get-NodeInstallLocation
+    $nvmPath = Get-NodeInstallLocation
 
-    $requestedVersion = Join-Path $nvmwPath $version
+    $requestedVersion = Join-Path $nvmPath $version
 
     if ((Test-Path -Path $requestedVersion)) {
         if ($Force) {
@@ -272,9 +272,9 @@ function Remove-NodeVersion {
         $Version
     )
 
-    $nvmwPath = Get-NodeInstallLocation
+    $nvmPath = Get-NodeInstallLocation
 
-    $requestedVersion = Join-Path $nvmwPath $Version
+    $requestedVersion = Join-Path $nvmPath $Version
 
     if (!(Test-Path -Path $requestedVersion)) {
         "Could not find node version $Version"
@@ -325,12 +325,12 @@ function Get-NodeVersions {
 
         $versions | Select-Object version | Sort-Object -Descending -Property version
     } else {
-        $nvmwPath = Get-NodeInstallLocation
+        $nvmPath = Get-NodeInstallLocation
 
-        if (!(Test-Path -Path $nvmwPath)) {
+        if (!(Test-Path -Path $nvmPath)) {
             "No Node.js versions have been installed"
         } else {
-            $versions = Get-ChildItem $nvmwPath | ForEach-Object { $_.Name }
+            $versions = Get-ChildItem $nvmPath | ForEach-Object { $_.Name }
 
             if ($Filter) {
                 $versions = $versions | Where-Object { $_.Contains($filter) }

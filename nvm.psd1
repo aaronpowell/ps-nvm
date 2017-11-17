@@ -96,10 +96,10 @@ PrivateData = @{
         Tags = 'nodejs'
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/aaronpowell/ps-nvmw/blob/master/License.md'
+        LicenseUri = 'https://github.com/aaronpowell/ps-nvm/blob/master/License.md'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/aaronpowell/ps-nvmw'
+        ProjectUri = 'https://github.com/aaronpowell/ps-nvm'
 
         # A URL to an icon representing this module.
         # IconUri = ''
@@ -115,7 +115,7 @@ PrivateData = @{
  } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-HelpInfoURI = 'https://github.com/aaronpowell/ps-nvmw/blob/master/README.md'
+HelpInfoURI = 'https://github.com/aaronpowell/ps-nvm/blob/master/README.md'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
