@@ -7,6 +7,16 @@
       {
         "type": "PowerShell",
         "request": "launch",
+        "name": "PowerShell Launch Current File w/Args Prompt",
+        "script": "${file}",
+        "args": [
+          "${command:SpecifyScriptArgs}"
+        ],
+        "cwd": "${file}"
+      },
+      {
+        "type": "PowerShell",
+        "request": "launch",
         "name": "PowerShell Launch Current File",
         "script": "${file}",
         "args": [],
