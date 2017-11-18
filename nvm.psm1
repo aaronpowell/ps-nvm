@@ -2,7 +2,15 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path $PSScriptRoot 'SemVer.dll')
+$semVerDllPath = Join-Path $PSScriptRoot 'SemVer.dll'
+
+if (!(Test-Path $semVerDllPath)) {
+    Push-Location .\.bootstrapper
+    . ./SemVerBootstrapper.ps1
+    Pop-Location
+}
+
+Import-Module $semVerDllPath
 
 function IsMac() {
     return (Test-Path variable:global:IsMacOS) -and $IsMacOS
