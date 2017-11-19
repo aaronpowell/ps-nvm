@@ -2,12 +2,12 @@
 
 [![powershellgallery](https://img.shields.io/powershellgallery/v/nvm.svg)](https://www.powershellgallery.com/packages/nvm)
 [![downloads](https://img.shields.io/powershellgallery/dt/nvm.svg?label=downloads)](https://www.powershellgallery.com/packages/nvm)
-[![codecov](https://codecov.io/gh/aaronpowell/ps-nvmw/branch/master/graph/badge.svg)](https://codecov.io/gh/aaronpowell/ps-nvmw)
+[![codecov](https://codecov.io/gh/aaronpowell/ps-nvm/branch/master/graph/badge.svg)](https://codecov.io/gh/aaronpowell/ps-nvm)
 
 | Operating System | Build Status |
 | ---------------- | ------------ |
-| Windows | [![Build status (Windows)](https://ci.appveyor.com/api/projects/status/iuytgb4lg1wp458f/branch/master?svg=true)](https://ci.appveyor.com/project/aaronpowell/ps-nvmw/branch/master) |
-| OSX, Linux | [![Build Status (OSX, Linux)](https://travis-ci.org/aaronpowell/ps-nvmw.svg?branch=master)](https://travis-ci.org/aaronpowell/ps-nvmw) |
+| Windows | [![Build status (Windows)](https://ci.appveyor.com/api/projects/status/iuytgb4lg1wp458f/branch/master?svg=true)](https://ci.appveyor.com/project/aaronpowell/ps-nvm/branch/master) |
+| OSX, Linux | [![Build Status (OSX, Linux)](https://travis-ci.org/aaronpowell/ps-nvm.svg?branch=master)](https://travis-ci.org/aaronpowell/ps-nvm) |
 
 This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell. This is inspired by [creationix's nvm](https://github.com/creationix/nvm) tool for bash.
 

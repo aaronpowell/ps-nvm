@@ -12,7 +12,7 @@
 RootModule = 'nvm.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.7.0'
+ModuleVersion = '1.7.1'
 
 # ID used to uniquely identify this module
 GUID = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
@@ -96,10 +96,10 @@ PrivateData = @{
         Tags = 'nodejs'
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/aaronpowell/ps-nvmw/blob/master/License.md'
+        LicenseUri = 'https://github.com/aaronpowell/ps-nvm/blob/master/License.md'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/aaronpowell/ps-nvmw'
+        ProjectUri = 'https://github.com/aaronpowell/ps-nvm'
 
         # A URL to an icon representing this module.
         # IconUri = ''
@@ -115,7 +115,7 @@ PrivateData = @{
  } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-HelpInfoURI = 'https://github.com/aaronpowell/ps-nvmw/blob/master/README.md'
+HelpInfoURI = 'https://github.com/aaronpowell/ps-nvm/blob/master/README.md'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
