@@ -8,7 +8,10 @@
       "identifier": "publish",
       "type": "process",
       "command": "dotnet",
-      "args": ["publish", "-o", "."],
+      "args": ["publish", "-o", ".."],
+      "options": {
+        "cwd": "${workspaceFolder}/.scripts"
+      },
       "problemMatcher": []
     },
     {
