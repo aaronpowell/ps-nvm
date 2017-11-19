@@ -32,7 +32,7 @@ matrix:
 
 install:
   - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
-  - dotnet publish -o .
+  - cd .scripts && dotnet publish -o .. && cd ..
 
 script:
   # Run tests and generate coverage report
