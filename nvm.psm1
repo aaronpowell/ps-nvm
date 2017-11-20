@@ -2,8 +2,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path $PSScriptRoot 'SemVer.dll')
-
 function IsMac() {
     return (Test-Path variable:global:IsMacOS) -and $IsMacOS
 }
