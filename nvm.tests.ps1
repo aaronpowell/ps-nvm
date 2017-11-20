@@ -237,3 +237,30 @@ Describe "Set-NodeVersion" {
         }
     }
 }
+
+Describe "Remove-NodeVersion" {
+    InModuleScope nvm {
+        It "Should remove a version" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            Mock Get-NodeInstallLocation { return $tmpDir }
+            Mock Test-Path { return $true }
+            Mock Remove-Item { }
+
+            Remove-NodeVersion 'v9.0.0'
+
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+        }
+
+        It "Should warn when version doesn't exist" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            Mock Get-NodeInstallLocation { return $tmpDir }
+            Mock Test-Path { return $false }
+            Mock Remove-Item { }
+
+            $version = 'v9.0.0'
+            $msg = Remove-NodeVersion $version
+
+            $msg | Should -Be  "Could not find node version $version"
+        }
+    }
+}
