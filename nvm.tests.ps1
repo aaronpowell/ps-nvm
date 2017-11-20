@@ -165,11 +165,30 @@ Describe "Set-NodeVersion" {
             It "Will set from the .nvmrc file" {
                 $tmpDir = [system.io.path]::GetTempPath()
                 Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('variable') -eq $false }
-                Mock Get-Content { return $nodeVersion }
+                Mock Get-Content -ParameterFilter { $Path -match '\.nvmrc$' } { return $nodeVersion }
                 Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
 
                 $response = Set-NodeVersion
                 $response | Should -Be "Switched to node version $nodeVersion"
+            }
+
+            It "Will set from the engines package.json field" {
+                $tmpDir = [system.io.path]::GetTempPath()
+                Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
+                    return (-not ($Path -match '\.nvmrc$'))
+                }
+                Mock Get-Content -ParameterFilter { $Path -match 'package.json$' } {
+                    return @{
+                        engines = @{
+                            node = '^9.0.0'
+                        }
+                    } | ConvertTo-Json
+                }
+                Mock Get-NodeVersions { return 'v9.1.0' }
+                Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
+
+                $response = Set-NodeVersion
+                $response | Should -Be "Switched to node version v9.1.0"
             }
         }
 

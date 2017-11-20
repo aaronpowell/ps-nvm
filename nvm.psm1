@@ -70,7 +70,7 @@ function Set-NodeVersion {
         }
         elseif (Test-Path ./package.json) {
             $packageJson = Get-Content ./package.json -Raw | ConvertFrom-Json
-            if ((Get-Member -InputObject $packageJson.engines -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
+            if ((Get-Member -InputObject $packageJson -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
                 # Use node engine field as version range
                 $Version = $packageJson.engines.node
             }
