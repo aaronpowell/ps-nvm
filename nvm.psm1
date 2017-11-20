@@ -25,34 +25,36 @@ function IsWindows() {
 function Set-NodeVersion {
     <#
     .Synopsis
-       Set the node.js version for the current session
+        Set the node.js version for the current session
     .Description
-       Set's the node.js version that was either provided with the -Version parameter, from using the .nvmrc file or the node engines field in package.json in the current working directory.
-    .Parameter $Version
-       A semver version range for the node.js version you wish to use.
-    .Parameter $Persist
-       If present, this will also set the node.js version to the permanent system path, of the specified scope, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell.
+        Set's the node.js version that was either provided with the -Version parameter, from using the .nvmrc file or the node engines field in package.json in the current working directory.
+    .Parameter Version
+        A semver version range for the node.js version you wish to use.
+    .Parameter Persist
+        If present, this will also set the node.js version to the permanent system path, of the specified scope, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell.
     .Example
-       Set based on the .nvmrc or package.json engines node field
-       Set-NodeVersion
+        C:\PS> Set-NodeVersion
+        Set based on the .nvmrc or package.json engines node field
     .Example
-       Set-NodeVersion 5.0.1
-       Set using explicit version
+        C:\PS> Set-NodeVersion 5.0.1
+        Set using explicit version
     .Example
-       Set-NodeVersion ~5.2
-       Sets to the latest installed patch version of v5.2
+        C:\PS> Set-NodeVersion ~5.2
+        Sets to the latest installed patch version of v5.2
     .Example
-       Set-NodeVersion ^5
-       Sets to the latest installed v5 version
+        C:\PS> Set-NodeVersion ^5
+        Sets to the latest installed v5 version
     .Example
-       Set-NodeVersion '>=5.0.0 <7.0.0'
-       Sets to the latest installed version between v5 and v7
+        C:\PS> Set-NodeVersion '>=5.0.0 <7.0.0'
+        Sets to the latest installed version between v5 and v7
     .Example
-       Set-NodeVersion v5.0.1 -Persist User
-       Set and persist in permamant system path for the current user
+        C:\PS> Set-NodeVersion v5.0.1 -Persist User
+        Set and persist in permamant system path for the current user
     .Example
-       Set-NodeVersion v5.0.1 -Persist Machine
-       Set and persist in permamant system path for the machine (Note: requires an admin shell)
+        C:\PS> Set-NodeVersion v5.0.1 -Persist Machine
+        Set and persist in permamant system path for the machine (Note: requires an admin shell)
+    .Link
+        https://github.com/aaronpowell/ps-nvm#set-nodeversion
     #>
     param(
         [string]
@@ -137,26 +139,28 @@ function Install-NodeVersion {
         Install a version of node.js
     .Description
         Download and install the specified version of node.js into the nvm directory. Once installed it can be used with Set-NodeVersion
-    .Parameter $Version
+    .Parameter Version
         A semver range for the version of node.js to install
-    .Parameter $Force
+    .Parameter Force
         Reinstall an already installed version of node.js
-    .Parameter $architecture
+    .Parameter Architecture
         The architecture of node.js to install, defaults to [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-    .Parameter $proxy
+    .Parameter Proxy
         Define HTTP proxy used when downloading an installer
     .Example
-        Install-NodeVersion v5.0.0
+        C:\PS> Install-NodeVersion v5.0.0
         Install version 5.0.0 of node.js into the module directory
     .Example
-        Install-NodeVersion ^5
+        C:\PS> Install-NodeVersion ^5
         Install the latest 5.x.x version of node.js into the module directory
     .Example
-        Install-NodeVersion v5.0.0 -Architecture x86
+        C:\PS> Install-NodeVersion v5.0.0 -Architecture x86
         Installs the x86 version even if you're on an x64 machine
     .Example
-        Install-NodeVersion v5.0.0 -Architecture x86 -proxy http://localhost:3128
+        C:\PS> Install-NodeVersion v5.0.0 -Architecture x86 -proxy http://localhost:3128
         Installs the x86 version even if you're on an x64 machine using default CNTLM proxy
+    .Link
+        https://github.com/aaronpowell/ps-nvm#install-nodeversion
     #>
     param(
         [string]
@@ -280,11 +284,13 @@ function Remove-NodeVersion {
         Removes an installed version of node.js
     .Description
         Removes an installed version of node.js along with any installed npm modules
-    .Parameter $Version
+    .Parameter Version
         The full version string of the node.js package to remove
     .Example
-        Remove-NodeVersion v5.0.0
+        C:\PS> Remove-NodeVersion v5.0.0
         Removes the v5.0.0 version of node.js from the nvm store
+    .Link
+        https://github.com/aaronpowell/ps-nvm#get-nodeversion
     #>
     param(
         [string]
@@ -311,33 +317,20 @@ function Get-NodeVersions {
         List local or remote node.js versions
     .Description
         Used to show all the node.js versions installed to nvm, using the -Remote option allows you to list versions of node.js available for install. Providing a -Filter parameter can filter the versions using the pattern, either local or remote versions. The versions are sorted from highest to lowest and can be compared with PowerShell operators.
-    .Parameter $Remote
+    .Parameter Remote
         Indicate whether or not to list local or remote versions
-    .Parameter $Filter
+    .Parameter Filter
         A semver version range to filter versions
     .Example
-        Get-NodeVersions -Filter '>=7.0.0 <9.0.0'
-
-        Major      : 8
-        Minor      : 9
-        Patch      : 1
-        PreRelease :
-        Build      :
-
-        Major      : 7
-        Minor      : 9
-        Patch      : 0
-        PreRelease :
-        Build      :
+        C:\PS> Get-NodeVersions -Remote -Filter ">=7.0.0 <9.0.0"
+        Show all versions available to download between v7 and v9
     .Example
-        Get-NodeVersions -Filter '>=7.0.0 <9.0.0' | % {"$_"}
-
-        v8.9.1
-        v7.9.0
+        C:\PS> Get-NodeVersions -Filter '>=7.0.0 <9.0.0' | % {"$_"}
+        Return the installed versions as strings
     .Example
-        (Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)
-
-        True
+        C:\PS>(Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)
+    .Link
+        https://github.com/aaronpowell/ps-nvm#get-nodeversion
     #>
     param(
         [switch]
@@ -372,10 +365,10 @@ function Set-NodeInstallLocation {
         Sets the path where node.js versions will be installed into
     .Description
         This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
-    .Parameter $Path
+    .Parameter Path
         The root folder for nvm
     .Example
-        Set-NodeInstallLocation -Path C:\Temp
+        C:\PS> Set-NodeInstallLocation -Path C:\Temp
     #>
     param(
         [string]
@@ -404,9 +397,8 @@ function Get-NodeInstallLocation {
         Gets the currnet node.js install path
     .Description
         Will return the path that node.js versions will be installed into
-    .Example
-        Get-NodeInstallLocation
-        c:\tmp\.nvm
+    .Link
+        https://github.com/aaronpowell/ps-nvm#get-nodeinstalllocation
     #>
     $settings = $null
     $settingsFile = Join-Path $PSScriptRoot 'settings.json'
