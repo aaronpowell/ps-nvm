@@ -2,6 +2,8 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot 'SemVer.dll')
+
 function IsMac() {
     return (Test-Path variable:global:IsMacOS) -and $IsMacOS
 }
@@ -25,20 +27,26 @@ function Set-NodeVersion {
     .Synopsis
        Set the node.js version for the current session
     .Description
-       Set's the node.js version that was either provided with the -Version parameter or from using the .nvmrc file in the current working directory.
+       Set's the node.js version that was either provided with the -Version parameter, from using the .nvmrc file or the node engines field in package.json in the current working directory.
     .Parameter $Version
-       A version string for the node.js version you wish to use. Use the format of v#.#.#. This also supports fuzzy matching, so v# will be the latest installed version starting with that major
+       A semver version range for the node.js version you wish to use.
     .Parameter $Persist
        If present, this will also set the node.js version to the permanent system path, of the specified scope, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell.
     .Example
-       Set based on the .nvmrc
+       Set based on the .nvmrc or package.json engines node field
        Set-NodeVersion
     .Example
-       Set-NodeVersion v5
-       Set using fuzzy matching
-    .Example
-       Set-NodeVersion v5.0.1
+       Set-NodeVersion 5.0.1
        Set using explicit version
+    .Example
+       Set-NodeVersion ~5.2
+       Sets to the latest installed patch version of v5.2
+    .Example
+       Set-NodeVersion ^5
+       Sets to the latest installed v5 version
+    .Example
+       Set-NodeVersion '>=5.0.0 <7.0.0'
+       Sets to the latest installed version between v5 and v7
     .Example
        Set-NodeVersion v5.0.1 -Persist User
        Set and persist in permamant system path for the current user
@@ -48,52 +56,59 @@ function Set-NodeVersion {
     #>
     param(
         [string]
-        [Parameter(Mandatory=$false)]
-        [ValidatePattern('^v\d(\.\d{1,2}){0,2}$')]
+        [Parameter(Mandatory = $false)]
         $Version,
         [string]
         [ValidateSet('User', 'Machine')]
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         $Persist
     )
 
     if ([string]::IsNullOrEmpty($Version)) {
-        if (Test-Path .\.nvmrc) {
-            $VersionToUse = Get-Content .\.nvmrc -Raw
+        if (Test-Path ./.nvmrc) {
+            $Version = Get-Content ./.nvmrc -Raw
+        }
+        elseif (Test-Path ./package.json) {
+            $packageJson = Get-Content ./package.json -Raw | ConvertFrom-Json
+            if ((Get-Member -InputObject $packageJson -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
+                # Use node engine field as version range
+                $Version = $packageJson.engines.node
+            }
+            else {
+                throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
+            }
         }
         else {
-            "Version not given and no .nvmrc file found in folder"
-            return
+            throw "Version not given and no .nvmrc or package.json found in folder"
         }
+    }
+
+    $Version = $Version.Trim()
+
+    $matchedVersion = if (!($Version -match "v\d\.\d{1,2}\.\d{1,2}")) {
+        Get-NodeVersions -Filter $Version | Select-Object -First 1
     }
     else {
-        $VersionToUse = $version
+        $Version
     }
 
-    $VersionToUse = $VersionToUse.replace("`n","").replace("`r","")
-
-    if (!($VersionToUse -match "v\d\.\d{1,2}\.\d{1,2}")) {
-        "Version found is not a full version, using fuzzy matching"
-        $VersionToUse = Get-NodeVersions -Filter $VersionToUse | Select-Object -First 1
-
-        if (!$VersionToUse) {
-            "No version found to fuzzy match against"
-            return
-        }
+    if (!$matchedVersion) {
+        throw "No version found that matches $Version"
     }
 
     $nvmPath = Get-NodeInstallLocation
 
-    $requestedVersion = Join-Path $nvmPath $VersionToUse
+    $requestedVersion = Join-Path $nvmPath $matchedVersion
     $binPath = if ((IsMac) -or (IsLinux)) {
         # Under macOS, the node binary is in a bin folder
         Join-Path $requestedVersion "bin"
-    } else {
+    }
+    else {
         $requestedVersion
     }
 
     if (!(Test-Path -Path $requestedVersion)) {
-        "Could not find node version $VersionToUse"
+        "Could not find node version $matchedVersion"
         return
     }
 
@@ -113,7 +128,7 @@ function Set-NodeVersion {
         [Environment]::SetEnvironmentVariable('PATH', $persistedPaths -join [System.IO.Path]::PathSeparator, $Persist)
     }
 
-    "Switched to node version $VersionToUse"
+    "Switched to node version $matchedVersion"
 }
 
 function Install-NodeVersion {
@@ -123,7 +138,7 @@ function Install-NodeVersion {
     .Description
         Download and install the specified version of node.js into the nvm directory. Once installed it can be used with Set-NodeVersion
     .Parameter $Version
-        The version of node.js to install
+        A semver range for the version of node.js to install
     .Parameter $Force
         Reinstall an already installed version of node.js
     .Parameter $architecture
@@ -134,6 +149,9 @@ function Install-NodeVersion {
         Install-NodeVersion v5.0.0
         Install version 5.0.0 of node.js into the module directory
     .Example
+        Install-NodeVersion ^5
+        Install the latest 5.x.x version of node.js into the module directory
+    .Example
         Install-NodeVersion v5.0.0 -Architecture x86
         Installs the x86 version even if you're on an x64 machine
     .Example
@@ -142,8 +160,7 @@ function Install-NodeVersion {
     #>
     param(
         [string]
-        [Parameter(Mandatory=$true)]
-        [ValidatePattern('^v{0,1}\d(\.\d{1,2}){0,2}$|^latest$')]
+        [Parameter(Mandatory = $true)]
         $Version,
 
         [switch]
@@ -160,85 +177,89 @@ function Install-NodeVersion {
     if ([string]::IsNullOrEmpty($Architecture)) {
         if (IsWindows) {
             $Architecture = $env:PROCESSOR_ARCHITECTURE
-        } else {
+        }
+        else {
             $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
         }
     }
 
-    $Architecture = $architecture.ToLower()
+    $Architecture = $Architecture.ToLower()
 
     if ($version -match "latest") {
         $listing = "https://nodejs.org/dist/latest/"
         $r = (Invoke-WebRequest -UseBasicParsing $listing).content
         if ($r -match "node-(v[0-9\.]+)") {
             $version = $matches[1]
-        } else {
+        }
+        else {
             throw "failed to retrieve latest version from '$listing'"
         }
-    } elseif ($version.StartsWith('v') -ne $true) {
-        $version = "v$version"
     }
 
-    if (!($version -match "v\d\.\d{1,2}\.\d{1,2}")) {
-        $matchedVersions = Get-NodeVersions -Filter $version -Remote | Select-Object -First 1
-        $Version = $matchedVersions.version
-    }
+    $matchedVersion = Get-NodeVersions -Filter $version -Remote | Select-Object -First 1
 
     $nvmPath = Get-NodeInstallLocation
 
-    $requestedVersion = Join-Path $nvmPath $version
+    $versionPath = Join-Path $nvmPath $matchedVersion
 
-    if ((Test-Path -Path $requestedVersion)) {
+    if ((Test-Path -Path $versionPath)) {
         if ($Force) {
-            Remove-Item -Recurse -Force $requestedVersion
-        } else {
-            throw "Version $version is already installed, use -Force to reinstall"
+            Remove-Item -Recurse -Force $versionPath
+        }
+        else {
+            throw "Version $matchedVersion is already installed, use -Force to reinstall"
         }
     }
 
-    New-Item $requestedVersion -ItemType 'Directory' | Out-Null
+    New-Item $versionPath -ItemType 'Directory' | Out-Null
 
     if (IsMac) {
         # Download .tar.gz for macOS
-        $file = "node-$version-darwin-$architecture.tar.gz"
-        $nodeUrl = "https://nodejs.org/dist/$version/$file"
-    } elseif (IsWindows) {
-        $file = "node-$version-x86.msi"
-        $nodeUrl = "https://nodejs.org/dist/$version/$file"
+        $file = "node-$matchedVersion-darwin-$architecture.tar.gz"
+        $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
+    }
+    elseif (IsWindows) {
+        $file = "node-$matchedVersion-x86.msi"
+        $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
 
         if ($architecture -eq 'amd64') {
-            $file = "node-$version-x64.msi"
+            $file = "node-$matchedVersion-x64.msi"
 
-            if ($version -match '^v0\.\d{1,2}\.\d{1,2}$') {
-                $nodeUrl = "https://nodejs.org/dist/$version/x64/$file"
-            } else {
-                $nodeUrl = "https://nodejs.org/dist/$version/$file"
+            if ($matchedVersion -match '^v0\.\d{1,2}\.\d{1,2}$') {
+                $nodeUrl = "https://nodejs.org/dist/$matchedVersion/x64/$file"
+            }
+            else {
+                $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
             }
         }
-    } elseif (IsLinux) {
-        $file = "node-$version-linux-$architecture.tar.gz"
-        $nodeUrl = "https://nodejs.org/dist/$version/$file"
-    } else {
+    }
+    elseif (IsLinux) {
+        $file = "node-$matchedVersion-linux-$architecture.tar.gz"
+        $nodeUrl = "https://nodejs.org/dist/$matchedVersion/$file"
+    }
+    else {
         throw "Unsupported OS Platform: $([System.Runtime.InteropServices.RuntimeInformation]::OSDescription)"
     }
 
-    $outFile = Join-Path $requestedVersion $file
+    $outFile = Join-Path $versionPath $file
     Write-Host "Downloading $nodeUrl"
     if ($Proxy) {
         Invoke-WebRequest -Uri $nodeUrl -OutFile $outFile -Proxy $Proxy
-    } else {
+    }
+    else {
         Invoke-WebRequest -Uri $nodeUrl -OutFile $outFile
     }
 
-    $unpackPath = Join-Path $requestedVersion '.u'
+    $unpackPath = Join-Path $versionPath '.u'
     New-Item $unpackPath -ItemType Directory | Out-Null
 
     if ((IsMac) -or (IsLinux)) {
         # Extract .tar.gz
         tar -zxf $outFile --directory $unpackPath --strip=1
         Remove-Item -Force $outFile
-        Move-Item (Join-Path $unpackPath '*') -Destination $requestedVersion -Force
-    } elseif (IsWindows) {
+        Move-Item (Join-Path $unpackPath '*') -Destination $versionPath -Force
+    }
+    elseif (IsWindows) {
         if (-Not (Get-Command msiexec)) {
             throw "msiexec is not in your path"
         }
@@ -247,7 +268,7 @@ function Install-NodeVersion {
 
         Start-Process -FilePath "msiexec.exe" -Wait -PassThru -ArgumentList $args
 
-        Move-Item (Join-Path (Join-Path $unpackPath 'nodejs') '*') -Destination $requestedVersion -Force
+        Move-Item (Join-Path (Join-Path $unpackPath 'nodejs') '*') -Destination $versionPath -Force
     }
 
     Remove-Item $unpackPath -Recurse -Force
@@ -267,7 +288,7 @@ function Remove-NodeVersion {
     #>
     param(
         [string]
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
         $Version
     )
@@ -289,56 +310,60 @@ function Get-NodeVersions {
     .Synopsis
         List local or remote node.js versions
     .Description
-        Used to show all the node.js versions installed to nvm, using the -Remote option allows you to list versions of node.js available for install. Providing a -Filter parameter can reduce the versions using the pattern, either local or remote versions
+        Used to show all the node.js versions installed to nvm, using the -Remote option allows you to list versions of node.js available for install. Providing a -Filter parameter can filter the versions using the pattern, either local or remote versions. The versions are sorted from highest to lowest and can be compared with PowerShell operators.
     .Parameter $Remote
         Indicate whether or not to list local or remote versions
     .Parameter $Filter
-        A version filter supporting fuzzy filters
+        A semver version range to filter versions
     .Example
-        Get-NodeVersions -Remote -Filter v4.2
-        version
-        -------
-        v4.2.6
-        v4.2.5
-        v4.2.4
-        v4.2.3
-        v4.2.2
-        v4.2.1
-        v4.2.0
+        Get-NodeVersions -Filter '>=7.0.0 <9.0.0'
+
+        Major      : 8
+        Minor      : 9
+        Patch      : 1
+        PreRelease :
+        Build      :
+
+        Major      : 7
+        Minor      : 9
+        Patch      : 0
+        PreRelease :
+        Build      :
+    .Example
+        Get-NodeVersions -Filter '>=7.0.0 <9.0.0' | % {"$_"}
+
+        v8.9.1
+        v7.9.0
+    .Example
+        (Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)
+
+        True
     #>
     param(
         [switch]
         $Remote,
 
         [string]
-        [Parameter(Mandatory=$false)]
-        [ValidatePattern('^v{0,1}\d(\.\d{1,2}){0,2}$')]
+        [Parameter(Mandatory = $false)]
         $Filter
     )
 
-    if ($Remote) {
-        $versions = Invoke-WebRequest -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json
-
-        if ($Filter) {
-            $versions = $versions | Where-Object { $_.version.Contains($filter) }
-        }
-
-        $versions | Select-Object version | Sort-Object -Descending -Property version
-    } else {
+    $range = [SemVer.Range]::new($Filter)
+    $versions = if ($Remote) {
+        Invoke-WebRequest -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json | ForEach-Object { $_.version } | ForEach-Object { [SemVer.Version]::new($_, $true) }
+    }
+    else {
         $nvmPath = Get-NodeInstallLocation
 
         if (!(Test-Path -Path $nvmPath)) {
-            "No Node.js versions have been installed"
-        } else {
-            $versions = Get-ChildItem $nvmPath | ForEach-Object { $_.Name }
-
-            if ($Filter) {
-                $versions = $versions | Where-Object { $_.Contains($filter) }
-            }
-
-            $versions | Sort-Object -Descending
+            throw "No Node.js versions have been installed"
+        }
+        else {
+            Get-ChildItem $nvmPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
+
+    $versions | Where-Object { $range.IsSatisfied($_) } | Sort-Object -Descending
 }
 
 function Set-NodeInstallLocation {
@@ -348,13 +373,13 @@ function Set-NodeInstallLocation {
     .Description
         This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
     .Parameter $Path
-        THe root folder for nvm
+        The root folder for nvm
     .Example
         Set-NodeInstallLocation -Path C:\Temp
     #>
     param(
         [string]
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         $Path
     )
 
@@ -363,7 +388,8 @@ function Set-NodeInstallLocation {
 
     if ((Test-Path $settingsFile) -eq $true) {
         $settings = Get-Content $settingsFile | ConvertFrom-Json
-    } else {
+    }
+    else {
         $settings = @{ 'InstallPath' = Get-NodeInstallLocation }
     }
 
@@ -387,7 +413,8 @@ function Get-NodeInstallLocation {
 
     if ((Test-Path $settingsFile) -eq $true) {
         $settings = Get-Content $settingsFile | ConvertFrom-Json
-    } else {
+    }
+    else {
         $settings = New-Object -TypeName PSObject -Prop @{ InstallPath = (Join-Path $PSScriptRoot 'vs') }
     }
 

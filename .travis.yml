@@ -1,5 +1,7 @@
 
-language: generic
+language: csharp
+dotnet: '2.0.0'
+mono: none
 
 env:
   global:
@@ -31,6 +33,7 @@ matrix:
 
 install:
   - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
+  - cd .scripts && dotnet publish -o .. && cd ..
 
 script:
   # Run tests and generate coverage report
