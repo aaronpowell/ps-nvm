@@ -3,74 +3,62 @@
 [![powershellgallery](https://img.shields.io/powershellgallery/v/nvm.svg)](https://www.powershellgallery.com/packages/nvm)
 [![downloads](https://img.shields.io/powershellgallery/dt/nvm.svg?label=downloads)](https://www.powershellgallery.com/packages/nvm)
 [![codecov](https://codecov.io/gh/aaronpowell/ps-nvm/branch/master/graph/badge.svg)](https://codecov.io/gh/aaronpowell/ps-nvm)
-
-| Operating System | Build Status |
-| ---------------- | ------------ |
-| Windows | [![Build status (Windows)](https://ci.appveyor.com/api/projects/status/iuytgb4lg1wp458f/branch/master?svg=true)](https://ci.appveyor.com/project/aaronpowell/ps-nvm/branch/master) |
-| OSX, Linux | [![Build Status (OSX, Linux)](https://travis-ci.org/aaronpowell/ps-nvm.svg?branch=master)](https://travis-ci.org/aaronpowell/ps-nvm) |
+[![windows build](https://img.shields.io/appveyor/ci/aaronpowell/ps-nvm/master.svg?label=windows+build)](https://ci.appveyor.com/project/aaronpowell/ps-nvm)
+[![macos/linux build](https://img.shields.io/travis/aaronpowell/ps-nvm/master.svg?label=macos/linux+build)](https://travis-ci.org/aaronpowell/ps-nvm)
 
 This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell. This is inspired by [creationix's nvm](https://github.com/creationix/nvm) tool for bash.
 
 Works on Windows, macOS and Linux.
 
-# Install via PowerShell Gallery
+## Getting Started
 
-nvm is available on the [PowerShell Gallery](https://www.powershellgallery.com/) as [nvm](https://www.powershellgallery.com/packages/nvm) and can easily be installed with:
+```powershell
+# Install from the PowerShell Gallery
+Install-Module nvm
 
+# Install Node v7
+Install-NodeVersion 7
+
+# Set active Node version in PATH to v7
+Set-NodeVersion 7
+
+# Set default Node version for the current user to v7 (Windows only)
+Set-NodeVersion -Persist User 7
+
+# Install the Node version specified in .nvmrc or package.json engine field
+Install-NodeVersion
 ```
-PS> Install-Module -Name nvm
+
+📖 [Full Command Reference](./.docs/reference.md)
+
+## Features
+
+### Semver ranges
+
+ps-nvm works with [semver ranges as used by npm](https://docs.npmjs.com/misc/semver#ranges).
+For example, you can pass `^6.0.0` or just `6` to `Install-NodeVersion` to install the latest 6.x.x version, or even `>=6.0.0 <9.0.0` to install the latest version between v6 and v7.
+Versions returned are [`SemVer.Version` objects](https://github.com/adamreeve/semver.net#readme) that can be compared with comparison operators like `-gt` and `-lt`.
+
+### .nvmrc
+
+If you don't specify a version for commands, ps-nvm will look for an .nvmrc plain text file in the current directory containing a node version to install.
+
+### package.json `engines.node`
+
+If you don't specify a version and no .nvmrc is found, ps-nvm will read a package.json file in the current directory and use whatever version satisfies the [`engines.node` field](https://docs.npmjs.com/files/package.json#engines).
+
+## Contributing
+
+```powershell
+# Install dependencies
+cd .scripts
+dotnet publish -o ..
+cd ..
+
+# Run tests
+Install-Module Pester
+Invoke-Pester
+
+# Regenerate documentation
+./.scripts/GenerateDocumentation.ps1
 ```
-
-You can then import the module or add it to your profile for auto-importing.
-
-# Installing manually
-
-Clone this repository or put the `psm1` somewhere on disk and import the module:
-
-    Import-Module <path to nvm.psm1>
-
-# Commands
-
-There are 6 PowerShell commands exposed. You're best using `Get-Help <command>` for proper help, but here's a quick overview.
-
-_Note: Node.js will restrict you to a version number of v#.#.#_
-
-## `Install-NodeVersion <version>`
-
-    Install-NodeVersion v0.10.33
-
-This will install the specified Node.js. You can also use a `-Force` flag to override an existing install. If you do not specify a version, the module searches for a .nvmrc file and reads the version from this file if available.
-
-
-## `Remove-NodeVersion <version>`
-
-    Remove-NodeVersion v0.10.33
-
-This will remove the specified Node.js version from your machine.
-
-## `Get-NodeVersions`
-
-    Get-NodeVersions
-
-Shows a list of what Node.js versions are available.
-
-## `Set-NodeVersion <version>`
-
-    Set-NodeVersion v0.10.33
-
-Makes the specified Node.js version the currently loaded Node.js version for your terminal.
-
-If you omit the `version` argument it will search for a `.nvmrc` file in the current directory and use that as the version.
-
-## `Get-NodeInstallLocation`
-
-    Get-NodeInstallLocation
-
-Returns the path where Node.js will be looking for and installing new versions into.
-
-## `Set-NodeInstallLocation`
-
-    Set-NodeInstallLocation -Path C:\temp
-
-Sets the base folder which Node.js versions will be installed into.
-
