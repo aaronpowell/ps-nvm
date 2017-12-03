@@ -62,15 +62,8 @@
       "args": ["-Command", "Invoke-Pester"],
       "options": {
         "shell": {
-          "executable": "pwsh",
+          "executable": "bash.exe",
           "args": ["-c"]
-        }
-      },
-      "windows": {
-        "options": {
-          "shell": {
-            "executable": "bash.exe"
-          }
         }
       },
       "group": {
