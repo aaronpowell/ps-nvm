@@ -46,3 +46,14 @@ If you don't specify a version for commands, ps-nvm will look for an .nvmrc plai
 ### package.json `engines.node`
 
 If you don't specify a version and no .nvmrc is found, ps-nvm will read a package.json file in the current directory and use whatever version satisfies the [`engines.node` field](https://docs.npmjs.com/files/package.json#engines).
+
+## Contributing
+
+```powershell
+# Run tests
+Install-Module Pester
+Invoke-Pester
+
+# Regenerate reference documentation
+./.scripts/GenerateDocumentation.ps1
+```
