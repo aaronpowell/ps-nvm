@@ -36,6 +36,9 @@ install:
   - cd .scripts && dotnet publish -o .. && cd ..
 
 script:
+  # Check that documentation was regenerated if needed
+  - pwsh .scripts/Generate-Documentation.ps1
+  - git diff --exit-code .docs/reference.md
   # Run tests and generate coverage report
   - pwsh -c '& {
       Import-Module ./.scripts/CodeCovIo.psm1;
