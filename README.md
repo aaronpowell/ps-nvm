@@ -50,10 +50,15 @@ If you don't specify a version and no .nvmrc is found, ps-nvm will read a packag
 ## Contributing
 
 ```powershell
+# Install dependencies
+cd .scripts
+dotnet publish -o ..
+cd ..
+
 # Run tests
 Install-Module Pester
 Invoke-Pester
 
-# Regenerate reference documentation
+# Regenerate documentation
 ./.scripts/GenerateDocumentation.ps1
 ```
