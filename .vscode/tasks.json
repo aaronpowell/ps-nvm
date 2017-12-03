@@ -55,6 +55,39 @@
       ]
     },
     {
+      "label": "Run Pester (WSL)",
+      "dependsOn": "publish",
+      "type": "shell",
+      "command": "pwsh",
+      "args": ["-Command", "Invoke-Pester"],
+      "options": {
+        "shell": {
+          "executable": "bash.exe",
+          "args": ["-c"]
+        }
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        {
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+              "message": 1
+            },
+            {
+              "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+              "file": 1,
+              "line": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
       "label": "Run Pester (inc Integration Tests)",
       "dependsOn": "publish",
       "type": "shell",
