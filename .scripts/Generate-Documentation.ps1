@@ -1,4 +1,6 @@
 
+Import-Module "$PSScriptRoot/../nvm.psd1"
+
 $toc = ''
 $doc = ''
 
