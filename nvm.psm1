@@ -2,7 +2,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. ./autocomplete-utils.ps1
+. "$PSScriptRoot/autocomplete-utils.ps1"
 
 function IsMac() {
     return (Test-Path variable:global:IsMacOS) -and $IsMacOS
