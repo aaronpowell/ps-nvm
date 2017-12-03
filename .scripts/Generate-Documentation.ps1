@@ -58,16 +58,12 @@ $examples
 }
 
 $fullMd = @"
-<!-- BEGIN OF GENERATED DOCUMENTATION -->
-<!-- to regenerate, run .scripts/Generate-Documentation.ps1 -->
-## Command Reference
+<!-- This file is generated. To regenerate, run .scripts/Generate-Documentation.ps1 -->
+
+# Command Reference
 
 $toc
 $doc
-<!-- END OF GENERATED DOCUMENTATION -->
 "@
 
-# Escape regexp special characters ($)
-$replacement = $fullMd -replace '\$', '$$$$'
-
-((Get-Content -Raw "$PSScriptRoot/../README.md") -replace '(?ms)<!-- BEGIN OF GENERATED DOCUMENTATION -->.*<!-- END OF GENERATED DOCUMENTATION -->', $replacement).TrimEnd() | Out-File "$PSScriptRoot/../README.md"
+$fullMd | Out-File "$PSScriptRoot/../.docs/reference.md"

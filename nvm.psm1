@@ -54,7 +54,7 @@ function Set-NodeVersion {
         C:\PS> Set-NodeVersion v5.0.1 -Persist Machine
         Set and persist in permamant system path for the machine (Note: requires an admin shell)
     .Link
-        https://github.com/aaronpowell/ps-nvm#set-nodeversion
+        https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md/blob/master/.docs/reference.md#set-nodeversion
     #>
     param(
         [string]
@@ -160,7 +160,7 @@ function Install-NodeVersion {
         C:\PS> Install-NodeVersion v5.0.0 -Architecture x86 -proxy http://localhost:3128
         Installs the x86 version even if you're on an x64 machine using default CNTLM proxy
     .Link
-        https://github.com/aaronpowell/ps-nvm#install-nodeversion
+        https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#install-nodeversion
     #>
     param(
         [string]
@@ -290,7 +290,7 @@ function Remove-NodeVersion {
         C:\PS> Remove-NodeVersion v5.0.0
         Removes the v5.0.0 version of node.js from the nvm store
     .Link
-        https://github.com/aaronpowell/ps-nvm#get-nodeversion
+        https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeversion
     #>
     param(
         [string]
@@ -330,7 +330,7 @@ function Get-NodeVersions {
     .Example
         C:\PS>(Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)
     .Link
-        https://github.com/aaronpowell/ps-nvm#get-nodeversion
+        https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeversion
     #>
     param(
         [switch]
@@ -398,7 +398,7 @@ function Get-NodeInstallLocation {
     .Description
         Will return the path that node.js versions will be installed into
     .Link
-        https://github.com/aaronpowell/ps-nvm#get-nodeinstalllocation
+        https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeinstalllocation
     #>
     $settings = $null
     $settingsFile = Join-Path $PSScriptRoot 'settings.json'
