@@ -205,7 +205,7 @@ Describe "Set-NodeVersion" {
                 { Set-NodeVersion } | Should Throw
             }
 
-            It "Will error is no version, no .nvmrc and now package.json" {
+            It "Will error if no version, no .nvmrc and no package.json" {
                 Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
                     return (-not ($Path -match '\.nvmrc$'))
                 }
