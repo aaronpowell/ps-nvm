@@ -190,6 +190,31 @@ Describe "Set-NodeVersion" {
                 $response = Set-NodeVersion
                 $response | Should -Be "Switched to node version v9.1.0"
             }
+
+            It "Will error if no version in the package.json field" {
+                Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
+                    return (-not ($Path -match '\.nvmrc$'))
+                }
+                Mock Get-Content -ParameterFilter { $Path -match 'package.json$' } {
+                    return @{
+                        engines = @{
+                        }
+                    } | ConvertTo-Json
+                }
+
+                { Set-NodeVersion } | Should Throw
+            }
+
+            It "Will error is no version, no .nvmrc and now package.json" {
+                Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
+                    return (-not ($Path -match '\.nvmrc$'))
+                }
+                Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
+                    return (-not ($Path -match 'package.json$'))
+                }
+
+                { Set-NodeVersion } | Should Throw
+            }
         }
 
         Context "Set from version string" {
