@@ -206,14 +206,12 @@ Describe "Set-NodeVersion" {
             }
 
             It "Will error if no version, no .nvmrc and no package.json" {
-                Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
-                    return (-not ($Path -match '\.nvmrc$'))
+                Mock Test-Path -ParameterFilter { $Path.Contains('.nvmrc') } {
+                    return $false
                 }
-                Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
-                    return (-not ($Path -match 'package.json$'))
-                }
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
-                { Set-NodeVersion } | Should Throw
+                { Set-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
             }
         }
 
