@@ -109,11 +109,6 @@ function Set-NodeVersion {
         $requestedVersion
     }
 
-    if (!(Test-Path -Path $requestedVersion)) {
-        "Could not find node version $matchedVersion"
-        return
-    }
-
     # immediately add to the current powershell session path
     # NOTE: it's important to use uppercase PATH for Unix systems as env vars
     # are case-sensitive on Unix but case-insensitive on Windows
