@@ -243,10 +243,10 @@ function Install-NodeVersion {
     $outFile = Join-Path $versionPath $file
     Write-Host "Downloading $nodeUrl"
     if ($Proxy) {
-        Invoke-WebRequest -Uri $nodeUrl -OutFile $outFile -Proxy $Proxy
+        Invoke-WebRequest -Uri $nodeUrl -OutFile $outFile -Proxy $Proxy -UseBasicParsing
     }
     else {
-        Invoke-WebRequest -Uri $nodeUrl -OutFile $outFile
+        Invoke-WebRequest -Uri $nodeUrl -OutFile $outFile -UseBasicParsing
     }
 
     $unpackPath = Join-Path $versionPath '.u'
@@ -338,7 +338,7 @@ function Get-NodeVersions {
 
     $range = [SemVer.Range]::new($Filter)
     $versions = if ($Remote) {
-        Invoke-WebRequest -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json | ForEach-Object { $_.version } | ForEach-Object { [SemVer.Version]::new($_, $true) }
+        Invoke-WebRequest -UseBasicParsing -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json | ForEach-Object { $_.version } | ForEach-Object { [SemVer.Version]::new($_, $true) }
     }
     else {
         $nvmPath = Get-NodeInstallLocation
