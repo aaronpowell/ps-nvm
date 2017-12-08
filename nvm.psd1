@@ -12,19 +12,19 @@
     RootModule            = 'nvm.psm1'
 
     # Version number of this module.
-    ModuleVersion         = '1.7.1'
+    ModuleVersion         = '2.0.0'
 
     # ID used to uniquely identify this module
     GUID                  = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
 
     # Author of this module
-    Author                = 'Aaron Powell'
+    Author                = 'Aaron Powell, Felix Becker and contributors'
 
     # Company or vendor of this module
-    CompanyName           = 'Aaron Powell'
+    CompanyName           = ''
 
     # Copyright statement for this module
-    Copyright             = '(c) 2017 Aaron Powell. All rights reserved.'
+    Copyright             = '(c) 2017 Aaron Powell and contributors'
 
     # Description of the functionality provided by this module
     Description           = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell.'
@@ -115,7 +115,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI           = 'https://github.com/aaronpowell/ps-nvm/blob/master/README.md'
+    HelpInfoURI           = 'https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
