@@ -12,7 +12,7 @@
     RootModule            = 'nvm.psm1'
 
     # Version number of this module.
-    ModuleVersion         = '2.0.1'
+    ModuleVersion         = '2.0.2'
 
     # ID used to uniquely identify this module
     GUID                  = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'

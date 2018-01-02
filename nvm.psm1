@@ -117,12 +117,11 @@ function Set-NodeVersion {
     if ($Persist -ne '') {
         # also add to the permanent windows path
         $persistedPaths = @($requestedVersion)
-        [Environment]::GetEnvironmentVariable('PATH', $Persist) -split [System.IO.Path]::PathSeparator | ForEach-Object {
-            if (-not($_ -like "$nvmPath*")) {
-                $persistedPaths += $_
-            }
+
+        $cleanedPath = [Environment]::GetEnvironmentVariable('PATH', $Persist) -split [System.IO.Path]::PathSeparator | Where-Object {
+            -not($_ -like "$nvmPath*")
         }
-        [Environment]::SetEnvironmentVariable('PATH', $persistedPaths -join [System.IO.Path]::PathSeparator, $Persist)
+        [Environment]::SetEnvironmentVariable('PATH', ($persistedPaths + $cleanedPath) -join [System.IO.Path]::PathSeparator, $Persist)
     }
 
     "Switched to node version $matchedVersion"
