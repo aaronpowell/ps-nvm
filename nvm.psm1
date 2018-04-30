@@ -350,7 +350,7 @@ function Get-NodeVersions {
         }
     }
 
-    $versions | Where-Object { $range.IsSatisfied($_) } | Sort-Object -Descending
+    $versions | Where-Object { $range.IsSatisfied($_) } | Sort-Object -Descending -Property Major, Minor, Patch, PreRelease, Build
 }
 
 function Set-NodeInstallLocation {
