@@ -319,7 +319,7 @@ function Get-NodeVersions {
         C:\PS> Get-NodeVersions -Remote -Filter ">=7.0.0 <9.0.0"
         Show all versions available to download between v7 and v9
     .Example
-        C:\PS> Get-NodeVersions -Filter '>=7.0.0 <9.0.0' | % {"$_"}
+        C:\PS> Get-NodeVersions -Filter '>=7.0.0 <9.0.0'
         Return the installed versions as strings
     .Example
         C:\PS>(Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>SemVer.Version</Name>
+            <ViewSelectedBy>
+                <TypeName>SemVer.Version</TypeName>
+            </ViewSelectedBy>
+            <WideControl>
+                <ColumnNumber>1</ColumnNumber>
+                <WideEntries>
+                    <WideEntry>
+                        <WideItem>
+                            <ScriptBlock>"$_"</ScriptBlock>
+                        </WideItem>
+                    </WideEntry>
+                </WideEntries>
+            </WideControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

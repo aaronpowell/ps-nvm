@@ -9,28 +9,28 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule            = 'nvm.psm1'
+    RootModule             = 'nvm.psm1'
 
     # Version number of this module.
-    ModuleVersion         = '2.0.2'
+    ModuleVersion          = '2.0.2'
 
     # ID used to uniquely identify this module
-    GUID                  = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
+    GUID                   = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
 
     # Author of this module
-    Author                = 'Aaron Powell, Felix Becker and contributors'
+    Author                 = 'Aaron Powell, Felix Becker and contributors'
 
     # Company or vendor of this module
-    CompanyName           = ''
+    CompanyName            = ''
 
     # Copyright statement for this module
-    Copyright             = '(c) 2017 Aaron Powell and contributors'
+    Copyright              = '(c) 2017 Aaron Powell and contributors'
 
     # Description of the functionality provided by this module
-    Description           = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell.'
+    Description            = 'Node Version Manager - This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell.'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion     = '5.1'
+    PowerShellVersion      = '5.1'
 
     # Name of the Windows PowerShell host required by this module
     # PowerShellHostName = ''
@@ -42,41 +42,41 @@
     DotNetFrameworkVersion = '4.7.1'
 
     # Minimum version of the common language runtime (CLR) required by this module
-    CLRVersion = '4.0'
+    CLRVersion             = '4.0'
 
     # Processor architecture (None, X86, Amd64) required by this module
-    ProcessorArchitecture = 'None'
+    ProcessorArchitecture  = 'None'
 
     # Modules that must be imported into the global environment prior to importing this module
     # RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies    = @('SemVer.dll')
+    RequiredAssemblies     = @('SemVer.dll')
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-    ScriptsToProcess      = @()
+    ScriptsToProcess       = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess        = @()
+    TypesToProcess         = @()
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess      = @()
+    FormatsToProcess       = @('nvm.Format.ps1xml')
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport     =
+    FunctionsToExport      =
     @("Set-NodeVersion", "Install-NodeVersion", "Remove-NodeVersion", "Get-NodeVersions", "Set-NodeInstallLocation", "Get-NodeInstallLocation")
 
     # Cmdlets to export from this module
-    CmdletsToExport       = @()
+    CmdletsToExport        = @()
 
     # Variables to export from this module
-    VariablesToExport     = @()
+    VariablesToExport      = @()
 
     # Aliases to export from this module
-    AliasesToExport       = @()
+    AliasesToExport        = @()
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -85,10 +85,10 @@
     # ModuleList = @()
 
     # List of all files packaged with this module
-    FileList              = @()
+    FileList               = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData           = @{
+    PrivateData            = @{
 
         PSData = @{
 
@@ -115,7 +115,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI           = 'https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md'
+    HelpInfoURI            = 'https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
