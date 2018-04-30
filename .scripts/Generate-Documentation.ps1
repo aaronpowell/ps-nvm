@@ -1,10 +1,12 @@
 
 Import-Module "$PSScriptRoot/../nvm.psd1"
+$version = (Import-PowerShellDataFile "$PSScriptRoot/../nvm.psd1").ModuleVersion
 
 $toc = ''
 $doc = ''
 
-(Get-Module nvm).ExportedCommands.Values.Name | Sort-Object | ForEach-Object {
+
+(Get-Module nvm | Where-Object { $_.Version -eq $version }).ExportedCommands.Values.Name | Sort-Object | ForEach-Object {
     $help = Get-Help $_
 
     $toc += @"
