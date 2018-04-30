@@ -164,12 +164,13 @@ Describe "Set-NodeVersion" {
 
             It "Will set from the .nvmrc file" {
                 $tmpDir = [system.io.path]::GetTempPath()
+                $nvmDir = Join-Path $tmpDir '.nvm'
                 Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('variable') -eq $false }
                 Mock Get-Content -ParameterFilter { $Path -match '\.nvmrc$' } { return $nodeVersion }
-                Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
+                Mock Get-NodeInstallLocation { return $nvmDir }
 
-                $response = Set-NodeVersion
-                $response | Should -Be "Switched to node version $nodeVersion"
+                Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will set from the engines package.json field" {
@@ -187,8 +188,8 @@ Describe "Set-NodeVersion" {
                 Mock Get-NodeVersions { return 'v9.1.0' }
                 Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
 
-                $response = Set-NodeVersion
-                $response | Should -Be "Switched to node version v9.1.0"
+                Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version v9.1.0"
             }
 
             It "Will error if no version in the package.json field" {
@@ -219,22 +220,22 @@ Describe "Set-NodeVersion" {
             $nodeVersion = 'v9.0.0'
 
             It "Will set from the supplied version" {
-                $response = Set-NodeVersion $nodeVersion
-                $response | Should -Be "Switched to node version $nodeVersion"
+                Set-NodeVersion $nodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will set from a version range" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion 'v9'
-                $response | Should -Be "Switched to node version $nodeVersion"
+                $response = Set-NodeVersion 'v9' -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will set from a version range with caret" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion '^9.0.0'
-                $response | Should -Be "Switched to node version $nodeVersion"
+                $response = Set-NodeVersion '^9.0.0' -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will throw error on unmatched version range" {
@@ -274,16 +275,14 @@ Describe "Remove-NodeVersion" {
             Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
         }
 
-        It "Should warn when version doesn't exist" {
+        It "Should throw when version doesn't exist" {
             $tmpDir = [system.io.path]::GetTempPath()
             Mock Get-NodeInstallLocation { return $tmpDir }
             Mock Test-Path { return $false }
             Mock Remove-Item { }
 
             $version = 'v9.0.0'
-            $msg = Remove-NodeVersion $version
-
-            $msg | Should -Be  "Could not find node version $version"
+            { Remove-NodeVersion $version } | Should -Throw "Could not find node version $version"
         }
     }
 }

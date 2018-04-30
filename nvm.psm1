@@ -124,7 +124,7 @@ function Set-NodeVersion {
         [Environment]::SetEnvironmentVariable('PATH', ($persistedPaths + $cleanedPath) -join [System.IO.Path]::PathSeparator, $Persist)
     }
 
-    "Switched to node version $matchedVersion"
+    Write-Information "Switched to node version $matchedVersion"
 }
 
 function Install-NodeVersion {
@@ -298,8 +298,7 @@ function Remove-NodeVersion {
     $requestedVersion = Join-Path $nvmPath $Version
 
     if (!(Test-Path -Path $requestedVersion)) {
-        "Could not find node version $Version"
-        return
+        throw "Could not find node version $Version"
     }
 
     Remove-Item $requestedVersion -Force -Recurse
