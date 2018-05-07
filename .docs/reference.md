@@ -55,7 +55,7 @@ Get-NodeVersions -Remote -Filter ">=7.0.0 <9.0.0"
 Show all versions available to download between v7 and v9    
  
 ```powershell
-Get-NodeVersions -Filter '>=7.0.0 <9.0.0' | % {"$_"}
+Get-NodeVersions -Filter '>=7.0.0 <9.0.0'
 ```
 
 Return the installed versions as strings    
