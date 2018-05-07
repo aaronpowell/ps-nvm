@@ -12,7 +12,7 @@
     RootModule             = 'nvm.psm1'
 
     # Version number of this module.
-    ModuleVersion          = '2.0.2'
+    ModuleVersion          = '2.1.0'
 
     # ID used to uniquely identify this module
     GUID                   = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
@@ -105,7 +105,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            # ReleaseNotes = ''
+            ReleaseNotes = 'Using a format document for the output of the installed versions and better log message handling'
 
             # External dependent modules of this module
             # ExternalModuleDependencies = ''
