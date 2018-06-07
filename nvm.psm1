@@ -87,7 +87,7 @@ function Set-NodeVersion {
 
     $Version = $Version.Trim()
 
-    $matchedVersion = if (!($Version -match "v\d*\.\d*\.\d*")) {
+    $matchedVersion = if (!($Version -match "v\d+\.\d+\.\d+")) {
         Get-NodeVersions -Filter $Version | Select-Object -First 1
     }
     else {
@@ -289,7 +289,7 @@ function Remove-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory = $true)]
-        [ValidatePattern('^v\d*\.\d*\.\d*$')]
+        [ValidatePattern('^v\d+\.\d+\.\d+$')]
         $Version
     )
 
