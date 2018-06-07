@@ -223,7 +223,7 @@ function Install-NodeVersion {
         if ($architecture -eq 'amd64') {
             $file = "node-$matchedVersion-x64.msi"
 
-            if ($matchedVersion -match '^v0\.\d*\.\d*$') {
+            if ($matchedVersion -match '^v0\.\d+\.\d+$') {
                 $nodeUrl = "https://nodejs.org/dist/$matchedVersion/x64/$file"
             }
             else {
