@@ -87,7 +87,7 @@ function Set-NodeVersion {
 
     $Version = $Version.Trim()
 
-    $matchedVersion = if (!($Version -match "v\d\.\d{1,2}\.\d{1,2}")) {
+    $matchedVersion = if (!($Version -match "v\d+\.\d+\.\d+")) {
         Get-NodeVersions -Filter $Version | Select-Object -First 1
     }
     else {
@@ -223,7 +223,7 @@ function Install-NodeVersion {
         if ($architecture -eq 'amd64') {
             $file = "node-$matchedVersion-x64.msi"
 
-            if ($matchedVersion -match '^v0\.\d{1,2}\.\d{1,2}$') {
+            if ($matchedVersion -match '^v0\.\d+\.\d+$') {
                 $nodeUrl = "https://nodejs.org/dist/$matchedVersion/x64/$file"
             }
             else {
@@ -289,7 +289,7 @@ function Remove-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory = $true)]
-        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d+\.\d+\.\d+$')]
         $Version
     )
 
