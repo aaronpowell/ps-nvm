@@ -32,7 +32,7 @@ matrix:
             - powershell
 
 install:
-  - pwsh -c "Install-Module -Force -Scope CurrentUser Pester"
+  - pwsh -c "Install-Module -Force -Scope CurrentUser Pester, PSCodeCovIo"
   - cd .scripts && dotnet publish -o .. && cd ..
 
 script:
@@ -41,7 +41,6 @@ script:
   - git diff --exit-code .docs/reference.md
   # Run tests and generate coverage report
   - pwsh -c '& {
-      Import-Module ./.scripts/CodeCovIo.psm1;
       $res = Invoke-Pester -PassThru -CodeCoverage nvm.psm1;
       Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json;
       if ($res.FailedCount -gt 0) {
