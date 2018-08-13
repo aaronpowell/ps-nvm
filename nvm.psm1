@@ -109,6 +109,20 @@ function Set-NodeVersion {
         $requestedVersion
     }
 
+    # If the requested version is already reachable (and first priority in the PATH),
+    # return early to not clutter the PATH with duplicate entries
+    # and only log "switched ..." when the version was actually switched.
+    # This makes it save to put Set-NodeVersion in the prompt function
+    try {
+        if ((Get-Command node -CommandType Application -ErrorAction SilentlyContinue).Source -eq (Join-Path $binPath 'node')) {
+            Write-Verbose "Version $requestedVersion already set"
+            return
+        }
+    }
+    catch {
+        # node is not in PATH yet, ignore
+    }
+
     # immediately add to the current powershell session path
     # NOTE: it's important to use uppercase PATH for Unix systems as env vars
     # are case-sensitive on Unix but case-insensitive on Windows
@@ -341,10 +355,7 @@ function Get-NodeVersions {
     else {
         $nvmPath = Get-NodeInstallLocation
 
-        if (!(Test-Path -Path $nvmPath)) {
-            throw "No Node.js versions have been installed"
-        }
-        else {
+        if (Test-Path -Path $nvmPath) {
             Get-ChildItem $nvmPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
