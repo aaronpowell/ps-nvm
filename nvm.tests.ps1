@@ -35,13 +35,11 @@ Describe "Get-NodeVersions" {
 
             }
 
-            It "Throws an error when no versions are installed" {
-                {
-                    $tmpDir = [system.io.path]::GetTempPath()
-                    Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
-                    Mock Test-Path { return $false }
-                    Get-NodeVersions -Filter 'v8.9.0'
-                } | Should -Throw 'No Node.js versions have been installed'
+            It "Returns nothing when no versions are installed" {
+                $tmpDir = [system.io.path]::GetTempPath()
+                Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
+                Mock Test-Path { return $false }
+                Get-NodeVersions -Filter 'v8.9.0' | Should -BeNullOrEmpty
             }
         }
 
