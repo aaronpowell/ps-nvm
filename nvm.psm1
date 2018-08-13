@@ -87,7 +87,7 @@ function Set-NodeVersion {
 
     $Version = $Version.Trim()
 
-    $matchedVersion = if (!($Version -match "v\d\.\d{1,2}\.\d{1,2}")) {
+    $matchedVersion = if (!($Version -match "v\d+\.\d+\.\d+")) {
         Get-NodeVersions -Filter $Version | Select-Object -First 1
     }
     else {
@@ -107,6 +107,20 @@ function Set-NodeVersion {
     }
     else {
         $requestedVersion
+    }
+
+    # If the requested version is already reachable (and first priority in the PATH),
+    # return early to not clutter the PATH with duplicate entries
+    # and only log "switched ..." when the version was actually switched.
+    # This makes it save to put Set-NodeVersion in the prompt function
+    try {
+        if ((Get-Command node -CommandType Application -ErrorAction SilentlyContinue).Source -eq (Join-Path $binPath 'node')) {
+            Write-Verbose "Version $requestedVersion already set"
+            return
+        }
+    }
+    catch {
+        # node is not in PATH yet, ignore
     }
 
     # immediately add to the current powershell session path
@@ -223,7 +237,7 @@ function Install-NodeVersion {
         if ($architecture -eq 'amd64') {
             $file = "node-$matchedVersion-x64.msi"
 
-            if ($matchedVersion -match '^v0\.\d{1,2}\.\d{1,2}$') {
+            if ($matchedVersion -match '^v0\.\d+\.\d+$') {
                 $nodeUrl = "https://nodejs.org/dist/$matchedVersion/x64/$file"
             }
             else {
@@ -289,7 +303,7 @@ function Remove-NodeVersion {
     param(
         [string]
         [Parameter(Mandatory = $true)]
-        [ValidatePattern('^v\d\.\d{1,2}\.\d{1,2}$')]
+        [ValidatePattern('^v\d+\.\d+\.\d+$')]
         $Version
     )
 
@@ -341,10 +355,7 @@ function Get-NodeVersions {
     else {
         $nvmPath = Get-NodeInstallLocation
 
-        if (!(Test-Path -Path $nvmPath)) {
-            throw "No Node.js versions have been installed"
-        }
-        else {
+        if (Test-Path -Path $nvmPath) {
             Get-ChildItem $nvmPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
