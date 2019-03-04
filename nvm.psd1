@@ -12,7 +12,7 @@
     RootModule             = 'nvm.psm1'
 
     # Version number of this module.
-    ModuleVersion          = '2.2.0'
+    ModuleVersion          = '2.3.0'
 
     # ID used to uniquely identify this module
     GUID                   = 'cb931787-e31c-454a-88e3-1c0c201e1e2d'
@@ -105,7 +105,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Better handling of when using Set-NodeVersion to the version already in use'
+            ReleaseNotes = 'Setting a relative npm prefix for when you pick a Node.js version'
 
             # External dependent modules of this module
             # ExternalModuleDependencies = ''
