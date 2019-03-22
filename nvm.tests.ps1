@@ -244,6 +244,13 @@ Describe "Set-NodeVersion" {
                 } | Should -Throw "No version found that matches v7"
             }
 
+            It "Will set npm config path" {
+                Mock Get-NodeVersions { return @('v9.0.0') }
+
+                $response = Set-NodeVersion 'v9' -InformationVariable infos
+                $env:NPM_CONFIG_GLOBALCONFIG | Should -not -Be $null
+            }
+
             BeforeEach {
                 $tmpDir = [system.io.path]::GetTempPath()
                 Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }

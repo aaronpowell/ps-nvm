@@ -127,6 +127,7 @@ function Set-NodeVersion {
     # NOTE: it's important to use uppercase PATH for Unix systems as env vars
     # are case-sensitive on Unix but case-insensitive on Windows
     $env:PATH = $binPath + [System.IO.Path]::PathSeparator + $env:PATH
+    $env:NPM_CONFIG_GLOBALCONFIG=(Join-Path $binPath npmrc)
 
     if ($Persist -ne '') {
         # also add to the permanent windows path
@@ -136,6 +137,8 @@ function Set-NodeVersion {
             -not($_ -like "$nvmPath*")
         }
         [Environment]::SetEnvironmentVariable('PATH', ($persistedPaths + $cleanedPath) -join [System.IO.Path]::PathSeparator, $Persist)
+
+        [Environment]::SetEnvironmentVariable('NPM_CONFIG_GLOBALCONFIG', (Join-Path $binPath npmrc), $Persist)
     }
 
     Write-Information "Switched to node version $matchedVersion"
@@ -282,6 +285,8 @@ function Install-NodeVersion {
 
         Move-Item (Join-Path (Join-Path $unpackPath 'nodejs') '*') -Destination $versionPath -Force
     }
+
+    Set-Content -Value "prefix=$versionPath" -Path (Join-Path $versionPath npmrc)
 
     Remove-Item $unpackPath -Recurse -Force
 }
