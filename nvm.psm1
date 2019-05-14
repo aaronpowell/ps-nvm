@@ -175,7 +175,7 @@ function Install-NodeVersion {
     #>
     param(
         [string]
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         $Version,
 
         [switch]
@@ -188,6 +188,27 @@ function Install-NodeVersion {
         [string]
         $Proxy
     )
+
+    if ([string]::IsNullOrEmpty($Version)) {
+        if (Test-Path ./.nvmrc) {
+            $Version = Get-Content ./.nvmrc -Raw
+        }
+        elseif (Test-Path ./package.json) {
+            $packageJson = Get-Content ./package.json -Raw | ConvertFrom-Json
+            if ((Get-Member -InputObject $packageJson -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
+                # Use node engine field as version range
+                $Version = $packageJson.engines.node
+            }
+            else {
+                throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
+            }
+        }
+        else {
+            throw "Version not given and no .nvmrc or package.json found in folder"
+        }
+    }
+
+    $Version = $Version.Trim()
 
     if ([string]::IsNullOrEmpty($Architecture)) {
         if (IsWindows) {
