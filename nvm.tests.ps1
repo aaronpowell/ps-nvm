@@ -89,6 +89,57 @@ Describe "Get-NodeInstallLocation" {
 
 Describe "Install-NodeVersion" {
     InModuleScope nvm {
+        Context "auto-discovery" {
+            $nodeVersion = 'v9.0.0'
+
+            It "Install version from the .nvmrc file" -Skip:($env:include_integration_tests -ne $true) {
+                Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $true }
+                Mock Get-Content -ParameterFilter { $Path -match '.nvmrc$' } { return $nodeVersion }
+
+                Install-NodeVersion
+
+                $versions = Get-NodeVersions -Filter 'v9.0.0'
+                $versions | Should -Be 'v9.0.0'
+            }
+
+            It "Install version from the package.json field" -Skip:($env:include_integration_tests -ne $true) {
+                Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
+                Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $true }
+                Mock Get-Content -ParameterFilter { $Path -match 'package.json$' } {
+                    return @{
+                        engines = @{
+                            node = '^9.0.0'
+                        }
+                    } | ConvertTo-Json
+                }
+
+                Install-NodeVersion
+
+                $versions = Get-NodeVersions -Filter 'v9.*'
+                $versions | Should -BeLike 'v9.*'
+            }
+
+            It "Will error if no version in the package.json field" -Skip:($env:include_integration_tests -ne $true) {
+                Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
+                Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $true }
+                Mock Get-Content -ParameterFilter { $Path -match 'package.json$' } {
+                    return @{
+                        engines = @{
+                        }
+                    } | ConvertTo-Json
+                }
+
+                { Install-NodeVersion } | Should Throw
+            }
+
+            It "Will error if no version, no .nvmrc and no package.json" -Skip:($env:include_integration_tests -ne $true) {
+                Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
+                Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $false }
+
+                { Install-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
+            }
+        }
+
         Context "Installing with a specific version" {
             It "Install a requested version" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'v9.0.0'
@@ -145,7 +196,9 @@ Describe "Install-NodeVersion" {
     }
 
     AfterEach {
-        Remove-Item -Recurse -Force $installLocation
+        if (Test-Path $installLocation) {
+            Remove-Item -Recurse -Force $installLocation
+        }
 
         $settingsFile = Join-Path $PSScriptRoot 'settings.json'
 
