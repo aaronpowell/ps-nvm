@@ -225,14 +225,14 @@ Describe "Set-NodeVersion" {
             It "Will set from a version range" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion 'v9' -InformationVariable infos
+                Set-NodeVersion 'v9' -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will set from a version range with caret" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion '^9.0.0' -InformationVariable infos
+                Set-NodeVersion '^9.0.0' -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
@@ -247,7 +247,7 @@ Describe "Set-NodeVersion" {
             It "Will set npm config path" {
                 Mock Get-NodeVersions { return @('v9.0.0') }
 
-                $response = Set-NodeVersion 'v9' -InformationVariable infos
+                Set-NodeVersion 'v9' -InformationVariable infos
                 $env:NPM_CONFIG_GLOBALCONFIG | Should -not -Be $null
             }
 
