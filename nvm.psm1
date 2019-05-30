@@ -127,7 +127,7 @@ function Set-NodeVersion {
     $separator = [System.IO.Path]::PathSeparator
 
     # get PATH entries without nvm-install paths
-    $nonNvmPath = ($env:PATH -split $separator | Where-Object {  $_ -notmatch "^$(Get-NodeInstallLocation)" }) -join $separator
+    $nonNvmPath = ($env:PATH -split $separator | Where-Object { -not $_.StartsWith($nvmPath) }) -join $separator
 
     # immediately add to the current powershell session path
     # NOTE: it's important to use uppercase PATH for Unix systems as env vars
@@ -140,7 +140,7 @@ function Set-NodeVersion {
         if (-not ((IsMac) -or (IsLinux)))
         {
             $originalPath = [Environment]::GetEnvironmentVariable('PATH', $Persist)
-            $cleanedPath = ($originalPath -split $separator | Where-Object {  $_ -notmatch "^$(Get-NodeInstallLocation)" }) -join $separator
+            $cleanedPath = ($originalPath -split $separator | Where-Object { -not $_.StartsWith($nvmPath) }) -join $separator
             [Environment]::SetEnvironmentVariable('PATH', (@($binPath, $cleanedPath) -join $separator), $Persist)
             [Environment]::SetEnvironmentVariable('NPM_CONFIG_GLOBALCONFIG', (Join-Path $binPath npmrc), $Persist)
         }

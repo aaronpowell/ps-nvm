@@ -253,10 +253,11 @@ Describe "Set-NodeVersion" {
 
             It "Will update environment path" {
                 $explicitVersion = "v9.32.99"
+                $nvmPath = Get-NodeInstallLocation
                 Set-NodeVersion -Version 'v9.0.0' -InformationVariable infos
                 Set-NodeVersion -Version $explicitVersion -InformationVariable infos
                 $separator = [System.IO.Path]::PathSeparator
-                [System.String[]]$nvmPaths = ($env:PATH -split $separator) | Where-Object { $_ -match "^$(Get-NodeInstallLocation)" }
+                [System.String[]]$nvmPaths = ($env:PATH -split $separator) | Where-Object { $_.StartsWith($nvmPath) }
                 $nvmPaths.Count | Should -Be 1
                 $nvmPaths | Should -Match $explicitVersion
             }
