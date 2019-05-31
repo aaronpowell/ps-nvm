@@ -225,14 +225,14 @@ Describe "Set-NodeVersion" {
             It "Will set from a version range" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion 'v9' -InformationVariable infos
+                Set-NodeVersion 'v9' -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will set from a version range with caret" {
                 Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
 
-                $response = Set-NodeVersion '^9.0.0' -InformationVariable infos
+                Set-NodeVersion '^9.0.0' -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
@@ -247,8 +247,19 @@ Describe "Set-NodeVersion" {
             It "Will set npm config path" {
                 Mock Get-NodeVersions { return @('v9.0.0') }
 
-                $response = Set-NodeVersion 'v9' -InformationVariable infos
+                Set-NodeVersion 'v9' -InformationVariable infos
                 $env:NPM_CONFIG_GLOBALCONFIG | Should -not -Be $null
+            }
+
+            It "Will update environment path" {
+                $explicitVersion = "v9.32.99"
+                $nvmPath = Get-NodeInstallLocation
+                Set-NodeVersion -Version 'v9.0.0' -InformationVariable infos
+                Set-NodeVersion -Version $explicitVersion -InformationVariable infos
+                $separator = [System.IO.Path]::PathSeparator
+                [System.String[]]$nvmPaths = ($env:PATH -split $separator) | Where-Object { $_.StartsWith($nvmPath) }
+                $nvmPaths.Count | Should -Be 1
+                $nvmPaths | Should -Match $explicitVersion
             }
 
             BeforeEach {
