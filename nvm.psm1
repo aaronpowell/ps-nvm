@@ -81,7 +81,13 @@ function Set-NodeVersion {
             }
         }
         else {
-            throw "Version not given and no .nvmrc or package.json found in folder"
+            $vsDefault = Join-Path (Get-NodeInstallLocation) "default"
+            if (Test-Path $vsDefault) {
+                $Version = Get-Content $vsDefault -Raw
+            }
+            else {
+                throw "Version not given, no .nvmrc or package.json found in folder, no default"
+            }
         }
     }
 
@@ -129,28 +135,52 @@ function Set-NodeVersion {
     # get PATH entries without nvm-install paths
     $nonNvmPath = ($env:PATH -split $separator | Where-Object { -not $_.StartsWith($nvmPath) }) -join $separator
 
-    # immediately add to the current powershell session path
+    # Immediately add to the current powershell session path
     # NOTE: it's important to use uppercase PATH for Unix systems as env vars
     # are case-sensitive on Unix but case-insensitive on Windows
     $env:PATH = @($binPath, $nonNvmPath) -join $separator
     $env:NPM_CONFIG_GLOBALCONFIG=(Join-Path $binPath npmrc)
 
-    # make the path persistent (only on windows)
+    # Make the node version persistent
     if ($Persist -ne '') {
-        if (-not ((IsMac) -or (IsLinux)))
-        {
+        if (-not ((IsMac) -or (IsLinux))) {
+            # Persist PATH on Windows
             $originalPath = [Environment]::GetEnvironmentVariable('PATH', $Persist)
             $cleanedPath = ($originalPath -split $separator | Where-Object { -not $_.StartsWith($nvmPath) }) -join $separator
             [Environment]::SetEnvironmentVariable('PATH', (@($binPath, $cleanedPath) -join $separator), $Persist)
             [Environment]::SetEnvironmentVariable('NPM_CONFIG_GLOBALCONFIG', (Join-Path $binPath npmrc), $Persist)
         }
-        else
-        {
-            # ignore this request on linux and mac
+        else {
+            # Set version when loading profile on Mac/Linux
+            Add-NvmToProfile $Version $Persist
         }
     }
 
     Write-Information "Switched to node version $matchedVersion"
+}
+
+function Add-NvmToProfile {
+    param(
+        [string]
+        $Version,
+        [ValidateSet('User', 'Machine')]
+        $Scope
+    )
+
+    # Write default version number
+    $vsDefault = Join-Path (Get-NodeInstallLocation) "default"
+    $Version | Set-Content $vsDefault
+
+    # Add command to profile script
+    $targetProfile = $Profile.CurrentUserCurrentHost
+    if ($Scope -eq 'Machine') {
+        $targetProfile = $Profile.AllUsersCurrentHost
+    }
+
+    $profileSrc = if (Test-Path $targetProfile) { Get-Content $targetProfile } else { "" }
+    if (!($profileSrc.Contains("Set-NodeVersion"))) {
+        "`n# nvm`nSet-NodeVersion" | Add-Content $targetProfile
+    }
 }
 
 function Install-NodeVersion {
@@ -391,7 +421,7 @@ function Get-NodeVersions {
         $nvmPath = Get-NodeInstallLocation
 
         if (Test-Path -Path $nvmPath) {
-            Get-ChildItem $nvmPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
+            Get-ChildItem $nvmPath -Attributes Directory | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
 
