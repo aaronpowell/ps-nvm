@@ -151,7 +151,7 @@ function Set-NodeVersion {
             [Environment]::SetEnvironmentVariable('NPM_CONFIG_GLOBALCONFIG', (Join-Path $binPath npmrc), $Persist)
         }
         else {
-            # Set version when loading profile on Mac/Linux
+            # Persist version in `default` file and call Set-NodeVersion in profile script
             Add-NvmToProfile $Version $Persist
         }
     }
