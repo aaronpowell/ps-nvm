@@ -138,7 +138,7 @@ Describe "Install-NodeVersion" {
                 Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
                 Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $false }
 
-                { Install-NodeVersion } | Should Throw "Version not given, no .nvmrc or package.json found in folder, no default"
+                { Install-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
             }
         }
 
@@ -248,7 +248,8 @@ Describe "Set-NodeVersion" {
             It "Will set from the default file" {
                 $tmpDir = [system.io.path]::GetTempPath()
                 $nvmDir = Join-Path $tmpDir '.nvm'
-                Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith('variable') -eq $false }
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
                 Mock Get-Content -ParameterFilter { $Path -match 'default$' } { return $nodeVersion }
                 Mock Get-NodeInstallLocation { return $nvmDir }
 
@@ -272,13 +273,11 @@ Describe "Set-NodeVersion" {
 
             It "Will error if no version, no .nvmrc and no package.json, no default" {
                 Mock Get-NodeInstallLocation { return "/" }
-                Mock Test-Path -ParameterFilter { $Path -eq '/default' } { return $false }
-                Mock Test-Path -ParameterFilter { $Path.Contains('.nvmrc') } {
-                    return $false
-                }
+                Mock Test-Path { return $false } -ParameterFilter { $Path -eq '/default' }
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
-                { Set-NodeVersion } | Should Throw "Version not given, no .nvmrc or package.json found in folder, no default"
+                { Set-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
             }
         }
 

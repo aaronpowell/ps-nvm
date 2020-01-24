@@ -66,32 +66,7 @@ function Set-NodeVersion {
         $Persist
     )
 
-    if ([string]::IsNullOrEmpty($Version)) {
-        if (Test-Path ./.nvmrc) {
-            $Version = Get-Content ./.nvmrc -Raw
-        }
-        elseif (Test-Path ./package.json) {
-            $packageJson = Get-Content ./package.json -Raw | ConvertFrom-Json
-            if ((Get-Member -InputObject $packageJson -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
-                # Use node engine field as version range
-                $Version = $packageJson.engines.node
-            }
-            else {
-                throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
-            }
-        }
-        else {
-            $vsDefault = Join-Path (Get-NodeInstallLocation) "default"
-            if (Test-Path $vsDefault) {
-                $Version = Get-Content $vsDefault -Raw
-            }
-            else {
-                throw "Version not given, no .nvmrc or package.json found in folder, no default"
-            }
-        }
-    }
-
-    $Version = $Version.Trim()
+    $Version = Get-TargetNodeVersion($Version).Trim()
 
     $matchedVersion = if (!($Version -match "v\d+\.\d+\.\d+")) {
         Get-NodeVersions -Filter $Version | Select-Object -First 1
@@ -157,6 +132,32 @@ function Set-NodeVersion {
     }
 
     Write-Information "Switched to node version $matchedVersion"
+}
+
+function Get-TargetNodeVersion($Version) {
+
+    if (![string]::IsNullOrEmpty($Version)) {
+        return $Version
+    }
+
+    if (Test-Path ./.nvmrc) {
+        return Get-Content ./.nvmrc -Raw
+    }
+
+    if (Test-Path ./package.json) {
+        $packageJson = Get-Content ./package.json -Raw | ConvertFrom-Json
+        if ((Get-Member -InputObject $packageJson -Name 'engines') -and (Get-Member -InputObject $packageJson.engines -Name 'node')) {
+            # Use node engine field as version range
+            return $packageJson.engines.node
+        }
+    }
+
+    $vsDefault = Join-Path (Get-NodeInstallLocation) "default"
+    if (Test-Path $vsDefault) {
+        return Get-Content $vsDefault -Raw
+    }
+
+    throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
 }
 
 function Add-NvmToProfile {
