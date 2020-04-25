@@ -163,8 +163,7 @@ Describe "Install-NodeVersion" {
             }
 
             It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '10.0.0', '11.0.0' }
-                Get-NodeVersions | Should -Contain 'v10.0.0', 'v11.0.0'
+                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
             }
         }
 
@@ -219,7 +218,7 @@ Describe "Install-NodeVersion" {
                 throw "The path exceeds the character limit"
             } `
             -ParameterFilter {
-                $FilePath -match 'misexec'
+                $FilePath -match 'msiexec'
             }
             It "Will error if the msi fails to install" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion latest } | Should -Throw
