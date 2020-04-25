@@ -1,3 +1,4 @@
+Remove-Module nvm -Force -ErrorAction SilentlyContinue
 Import-Module ./nvm.psd1
 
 Describe "Get-NodeVersions" {
@@ -160,6 +161,11 @@ Describe "Install-NodeVersion" {
             It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
             }
+
+            It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion -Version '10.0.0', '11.0.0' }
+                Get-NodeVersions | Should -Contain 'v10.0.0', 'v11.0.0'
+            }
         }
 
         Context "Major version installing" {
@@ -186,6 +192,37 @@ Describe "Install-NodeVersion" {
 
                 $versions = Get-NodeVersions
                 $versions.GetType() | Should -Be 'SemVer.Version'
+            }
+        }
+
+        Context "Incomplete installation" {
+            Mock Get-Command {
+                throw (
+                    "The term '$Name' is not recognized as the name of a cmdlet, function, script file, or " +
+                    "operable program. Check the spelling of the name, or if a path was included, verify that " +
+                    "the path is correct and try again."
+                )
+            } `
+            -ParameterFilter {
+                $Name -match 'node' -or $Name -match 'npm'
+            }
+            It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion latest } | Should -Throw
+            }
+        }
+
+        Context "MSI error" {
+            Mock Start-Process {
+                [PSCustomObject]@{
+                    ExitCode = 1602
+                }
+                throw "The path exceeds the character limit"
+            } `
+            -ParameterFilter {
+                $FilePath -match 'misexec'
+            }
+            It "Will error if the msi fails to install" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion latest } | Should -Throw
             }
         }
     }
@@ -342,6 +379,34 @@ Describe "Remove-NodeVersion" {
             Remove-NodeVersion 'v9.0.0'
 
             Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+        }
+
+        It "Should remove multiple versions" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            Mock Get-NodeInstallLocation { return $tmpDir }
+            Mock Test-Path { return $true }
+            Mock Remove-Item { }
+
+            Remove-NodeVersion 'v9.0.0', 'v10.0.0'
+
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v10.0.0') }
+        }
+
+        It "Should remove versions passed from the pipeline" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            Mock Get-NodeInstallLocation { return $tmpDir }
+            Mock Test-Path { return $true }
+            Mock Remove-Item { }
+            Mock Get-NodeVersions { 
+                'v9.0.0'
+                'v10.0.0'
+            }
+
+            Get-NodeVersions | Remove-NodeVersion
+
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v10.0.0') }
         }
 
         It "Should throw when version doesn't exist" {
