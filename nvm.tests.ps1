@@ -9,10 +9,25 @@ Describe "Get-NodeVersions" {
                 Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
-                    $ret = @()
-                    $ret += @{ Name = 'v8.9.0' }
-                    $ret += @{ Name = 'v9.0.0' }
-                    return $ret
+                    [PSCustomObject]@{
+                        Name = 'v8.9.0'
+                        Path = "$Path\v8.9.0"
+                    }
+                    [PSCustomObject]@{
+                        Name = 'v9.0.0'
+                        Path = "$Path\v9.0.0"
+                    }
+                }
+                Mock Get-ChildItem {
+                    [PSCustomObject]@{
+                        Name = 'node.exe'
+                        VersionInfo = [PSCustomObject]@{
+                            ProductVersion = ( Split-Path -Path $Path -Leaf )
+                        }
+                    }
+                } `
+                -ParameterFilter {
+                    $Filter -match '.*node.*'
                 }
 
                 $versions = Get-NodeVersions
@@ -25,10 +40,25 @@ Describe "Get-NodeVersions" {
                 Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
-                    $ret = @()
-                    $ret += @{ Name = 'v8.9.0' }
-                    $ret += @{ Name = 'v9.0.0' }
-                    return $ret
+                    [PSCustomObject]@{
+                        Name = 'v8.9.0'
+                        Path = "$Path\v8.9.0"
+                    }
+                    [PSCustomObject]@{
+                        Name = 'v9.0.0'
+                        Path = "$Path\v9.0.0"
+                    }
+                }
+                Mock Get-ChildItem {
+                    [PSCustomObject]@{
+                        Name = 'node.exe'
+                        VersionInfo = [PSCustomObject]@{
+                            ProductVersion = ( Split-Path -Path $Path -Leaf )
+                        }
+                    }
+                } `
+                -ParameterFilter {
+                    $Filter -match '.*node.*'
                 }
 
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
