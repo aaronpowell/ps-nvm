@@ -424,14 +424,18 @@ function Get-NodeVersions {
     )
 
     $range = [SemVer.Range]::new($Filter)
-    $versions = if ($Remote) {
+    $versions = @()
+    $versions += if ($Remote) {
+        $currentProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue'
         Invoke-WebRequest -UseBasicParsing -Uri https://nodejs.org/dist/index.json | ConvertFrom-Json | ForEach-Object { $_.version } | ForEach-Object { [SemVer.Version]::new($_, $true) }
+        $ProgressPreference = $currentProgressPreference
     }
     else {
         $nvmPath = Get-NodeInstallLocation
 
         if (Test-Path -Path $nvmPath) {
-            ('v' + ( Get-ChildItem $nvmPath | Get-ChildItem -Filter 'node.*' ).VersionInfo.ProductVersion) | ForEach-Object { [SemVer.Version]::new($_, $true) }
+            ( Get-ChildItem $nvmPath | Get-ChildItem -Filter 'node.*' ).VersionInfo.ProductVersion | Foreach-Object { 'v' + $_ } | ForEach-Object { [SemVer.Version]::new($_, $true) }
         }
     }
 

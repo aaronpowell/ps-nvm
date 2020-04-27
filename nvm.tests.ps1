@@ -22,7 +22,7 @@ Describe "Get-NodeVersions" {
                     [PSCustomObject]@{
                         Name = 'node.exe'
                         VersionInfo = [PSCustomObject]@{
-                            ProductVersion = ( Split-Path -Path $Path -Leaf )
+                            ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                         }
                     }
                 } `
@@ -53,7 +53,7 @@ Describe "Get-NodeVersions" {
                     [PSCustomObject]@{
                         Name = 'node.exe'
                         VersionInfo = [PSCustomObject]@{
-                            ProductVersion = ( Split-Path -Path $Path -Leaf )
+                            ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                         }
                     }
                 } `
