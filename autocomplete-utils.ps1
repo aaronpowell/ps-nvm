@@ -1,3 +1,7 @@
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "")]
+[CmdletBinding()]
+param ()
+
 $completion_AvailableNodeVersions = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameter)
 

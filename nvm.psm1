@@ -121,6 +121,7 @@ function Set-NodeVersion {
     }
     catch {
         # node is not in PATH yet, ignore
+        Write-Verbose -Message 'PATH does not contain node.'
     }
 
     # separator
@@ -241,7 +242,7 @@ function Install-NodeVersion {
 
         if ($versionNumber -match "latest") {
             $listing = "https://nodejs.org/dist/latest/"
-            $r = (Invoke-WebRequest -UseBasicParsing $listing).content
+            $r = ( Invoke-WebRequest $listing -UseBasicParsing ).Content
             if ($r -match "node-(v[0-9\.]+)") {
                 $versionNumber = $matches[1]
             }
