@@ -105,7 +105,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'PR #76 & PR #79 merged. Supporting install from package.json and .nvmrc defined version and fixing path not overridden in some scenarios.'
+            ReleaseNotes = 'Improve Install/Remove-NodeVersion.'
 
             # External dependent modules of this module
             # ExternalModuleDependencies = ''
