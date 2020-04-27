@@ -431,7 +431,7 @@ function Get-NodeVersions {
         $nvmPath = Get-NodeInstallLocation
 
         if (Test-Path -Path $nvmPath) {
-            ( Get-ChildItem $nvmPath | Get-ChildItem -Filter 'node.*' ).VersionInfo.ProductVersion | ForEach-Object { [SemVer.Version]::new($_, $true) }
+            ('v' + ( Get-ChildItem $nvmPath | Get-ChildItem -Filter 'node.*' ).VersionInfo.ProductVersion) | ForEach-Object { [SemVer.Version]::new($_, $true) }
         }
     }
 
