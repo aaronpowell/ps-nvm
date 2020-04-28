@@ -20,11 +20,6 @@ jobs:
         cd .scripts
         dotnet publish -o ..
 
-    - name: Check that documentation was regenerated if needed
-      run: |
-        pwsh .scripts/Generate-Documentation.ps1
-        git diff --exit-code .docs/reference.md
-
     - name: Run tests and generate coverage report
       env:
         include_integration_tests: true
