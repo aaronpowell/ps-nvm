@@ -56,6 +56,7 @@ function Set-NodeVersion {
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md/blob/master/.docs/reference.md#set-nodeversion
     #>
+    [CmdletBinding()]
     param(
         [string]
         [Parameter(Mandatory = $false)]
@@ -186,6 +187,7 @@ function Install-NodeVersion {
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#install-nodeversion
     #>
+    [CmdletBinding()]
     param(
         [string[]]
         [Parameter(Mandatory = $false)]
@@ -371,6 +373,7 @@ function Remove-NodeVersion {
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeversion
     #>
+    [CmdletBinding()]
     param(
         [string[]]
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -414,6 +417,7 @@ function Get-NodeVersions {
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeversion
     #>
+    [CmdletBinding()]
     param(
         [switch]
         $Remote,
@@ -453,6 +457,7 @@ function Set-NodeInstallLocation {
     .Example
         C:\PS> Set-NodeInstallLocation -Path C:\Temp
     #>
+    [CmdletBinding()]
     param(
         [string]
         [Parameter(Mandatory = $true)]
@@ -477,12 +482,16 @@ function Set-NodeInstallLocation {
 function Get-NodeInstallLocation {
     <#
     .Synopsis
-        Gets the currnet node.js install path
+        Gets the current node.js install path
     .Description
         Will return the path that node.js versions will be installed into
+    .EXAMPLE
+        Get-NodeInstallLocation
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeinstalllocation
     #>
+    [CmdletBinding()]
+    param ()
     $settings = $null
     $settingsFile = Join-Path $PSScriptRoot 'settings.json'
 
