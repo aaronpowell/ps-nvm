@@ -18,16 +18,13 @@ Describe "Get-NodeVersions" {
                         Path = "$Path\v9.0.0"
                     }
                 }
-                Mock Get-ChildItem {
+                Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
                     [PSCustomObject]@{
                         Name = 'node.exe'
                         VersionInfo = [PSCustomObject]@{
                             ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                         }
                     }
-                } `
-                -ParameterFilter {
-                    $Filter -match '.*node.*'
                 }
 
                 $versions = Get-NodeVersions
@@ -49,16 +46,13 @@ Describe "Get-NodeVersions" {
                         Path = "$Path\v9.0.0"
                     }
                 }
-                Mock Get-ChildItem {
+                Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
                     [PSCustomObject]@{
                         Name = 'node.exe'
                         VersionInfo = [PSCustomObject]@{
                             ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                         }
                     }
-                } `
-                -ParameterFilter {
-                    $Filter -match '.*node.*'
                 }
 
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
@@ -225,31 +219,27 @@ Describe "Install-NodeVersion" {
         }
 
         Context "Incomplete installation" {
-            Mock Get-Command {
+            Mock Get-Command -ParameterFilter { $Name -match 'node' -or $Name -match 'npm' } {
                 throw (
                     "The term '$Name' is not recognized as the name of a cmdlet, function, script file, or " +
                     "operable program. Check the spelling of the name, or if a path was included, verify that " +
                     "the path is correct and try again."
                 )
-            } `
-            -ParameterFilter {
-                $Name -match 'node' -or $Name -match 'npm'
             }
+
             It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion latest } | Should -Throw
             }
         }
 
         Context "MSI error" {
-            Mock Start-Process {
+            Mock Start-Process -ParameterFilter { $FilePath -match 'msiexec' } {
                 [PSCustomObject]@{
                     ExitCode = 1602
                 }
                 throw "The path exceeds the character limit"
-            } `
-            -ParameterFilter {
-                $FilePath -match 'msiexec'
             }
+
             It "Will error if the msi fails to install" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion latest } | Should -Throw
             }
@@ -385,6 +375,37 @@ Describe "Set-NodeVersion" {
                 $tmpDir = [system.io.path]::GetTempPath()
                 Mock Get-NodeInstallLocation { return Join-Path $tmpDir '.nvm' }
                 Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith((Join-Path $tmpDir '.nvm')) -eq $true }
+            }
+        }
+
+        Context "pipeline" {
+            $nodeVersion = "v9.0.0"
+            Mock Test-Path -ParameterFilter { $Path -match 'vs'} { return $true }
+            Mock Get-ChildItem {
+                [PSCustomObject]@{
+                    Name = 'v9.0.0'
+                    Path = "$Path\v9.0.0"
+                }
+            }
+            Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
+                [PSCustomObject]@{
+                    Name = 'node.exe'
+                    VersionInfo = [PSCustomObject]@{
+                        ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
+                    }
+                }
+            }
+            It "Will set from the supplied version via Install-NodeVersion pipeline output" {
+                [PSCustomObject]@{
+                    Name = 'node.exe'
+                    Version = '9.0.0.0'
+                } | Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
+            }
+
+            It "Will set from the supplied version via Get-NodeVersion pipeline output" {
+                [SemVer.Version]::new($nodeVersion, $true) | Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
             }
         }
     }
