@@ -51,6 +51,7 @@ jobs:
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v1
+        if: ${{ matrix.os }} == 'ubuntu-latest'
         with:
           name: nvm
           path: ./nvm
