@@ -50,15 +50,17 @@ Get-NodeVersions -Remote <SwitchParameter> -Filter <String>
 
 ```powershell
 Get-NodeVersions -Remote -Filter ">=7.0.0 <9.0.0"
+Show all versions available to download between v7 and v9
 ```
 
-Show all versions available to download between v7 and v9    
+    
  
 ```powershell
 Get-NodeVersions -Filter '>=7.0.0 <9.0.0'
+Return the installed versions as strings
 ```
 
-Return the installed versions as strings    
+    
  
 ```powershell
 (Get-NodeVersions | Select-Object -First 1) -lt (Get-NodeVersions -Remote | Select-Object -First 1)
@@ -90,27 +92,31 @@ Install-NodeVersion -Version <String> -Force <SwitchParameter> -Architecture <St
 
 ```powershell
 Install-NodeVersion v5.0.0
+Install version 5.0.0 of node.js into the module directory
 ```
 
-Install version 5.0.0 of node.js into the module directory    
+    
  
 ```powershell
 Install-NodeVersion ^5
+Install the latest 5.x.x version of node.js into the module directory
 ```
 
-Install the latest 5.x.x version of node.js into the module directory    
+    
  
 ```powershell
 Install-NodeVersion v5.0.0 -Architecture x86
+Installs the x86 version even if you're on an x64 machine
 ```
 
-Installs the x86 version even if you're on an x64 machine    
+    
  
 ```powershell
 Install-NodeVersion v5.0.0 -Architecture x86 -proxy http://localhost:3128
+Installs the x86 version even if you're on an x64 machine using default CNTLM proxy
 ```
 
-Installs the x86 version even if you're on an x64 machine using default CNTLM proxy    
+    
 ### `Remove-NodeVersion`
 <a id="remove-nodeversion"></a>
 
@@ -130,9 +136,10 @@ Remove-NodeVersion -Version <String>
 
 ```powershell
 Remove-NodeVersion v5.0.0
+Removes the v5.0.0 version of node.js from the nvm store
 ```
 
-Removes the v5.0.0 version of node.js from the nvm store    
+    
 ### `Set-NodeInstallLocation`
 <a id="set-nodeinstalllocation"></a>
 
@@ -176,43 +183,50 @@ Set-NodeVersion -Version <String> -Persist <String>
 
 ```powershell
 Set-NodeVersion
+Set based on the .nvmrc or package.json engines node field
 ```
 
-Set based on the .nvmrc or package.json engines node field    
+    
  
 ```powershell
 Set-NodeVersion 5.0.1
+Set using explicit version
 ```
 
-Set using explicit version    
+    
  
 ```powershell
 Set-NodeVersion ~5.2
+Sets to the latest installed patch version of v5.2
 ```
 
-Sets to the latest installed patch version of v5.2    
+    
  
 ```powershell
 Set-NodeVersion ^5
+Sets to the latest installed v5 version
 ```
 
-Sets to the latest installed v5 version    
+    
  
 ```powershell
 Set-NodeVersion '>=5.0.0 <7.0.0'
+Sets to the latest installed version between v5 and v7
 ```
 
-Sets to the latest installed version between v5 and v7    
+    
  
 ```powershell
 Set-NodeVersion v5.0.1 -Persist User
+Set and persist in permamant system path for the current user
 ```
 
-Set and persist in permamant system path for the current user    
+    
  
 ```powershell
 Set-NodeVersion v5.0.1 -Persist Machine
+Set and persist in permamant system path for the machine (Note: requires an admin shell)
 ```
 
-Set and persist in permamant system path for the machine (Note: requires an admin shell)    
+    
 
