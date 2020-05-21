@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.0.0
+
+      - name: Install dependencies
+        run: |
+          Install-Module -Force -Scope CurrentUser Pester, PSCodeCovIo
+          cd .scripts
+          dotnet publish -o ..
+        shell: pwsh
+
+      - name: Run tests and generate coverage report
+        env:
+          include_integration_tests: true
+        run: |
+          $res = Invoke-Pester -PassThru -CodeCoverage nvm.psm1;
+          Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json;
+          if ($res.FailedCount -gt 0) {
+            throw "$($res.FailedCount) tests failed."
+          }
+        shell: pwsh
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir nvm
+          cp nvm.* nvm
+          cp SemVer.dll nvm
+          cp *.md nvm
+          cp autocomplete-utils.ps1 nvm
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: nvm
+          path: ./nvm
+
+  release_gallery:
+    name: Release to PowerShell Gallery
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v1
+        with:
+          name: nvm
+          path: nvm
+
+      - name: Publish to PowerShell Gallery
+        run: |
+          Publish-Module -Path (Get-Location) -NuGetApiKey $env:POWERSHELL_GALLERY -Force
+        working-directory: nvm
+        shell: pwsh
+
+  release_github:
+    name: Release to GitHub
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v1
+        with:
+          name: nvm
+          path: nvm
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Latest release of PowerShell nvm
+          draft: false
+          prerelease: false
+
+      - name: Create zip
+        run: |
+          zip nvm *
+        working-directory: nvm
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nvm/nvm.zip
+          asset_name: nvm.zip
+          asset_content_type: application/zip
