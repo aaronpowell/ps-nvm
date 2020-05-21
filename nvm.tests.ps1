@@ -1,3 +1,4 @@
+Remove-Module nvm -Force -ErrorAction SilentlyContinue
 Import-Module ./nvm.psd1
 
 Describe "Get-NodeVersions" {
@@ -8,10 +9,22 @@ Describe "Get-NodeVersions" {
                 Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
-                    $ret = @()
-                    $ret += @{ Name = 'v8.9.0' }
-                    $ret += @{ Name = 'v9.0.0' }
-                    return $ret
+                    [PSCustomObject]@{
+                        Name = 'v8.9.0'
+                        Path = "$Path\v8.9.0"
+                    }
+                    [PSCustomObject]@{
+                        Name = 'v9.0.0'
+                        Path = "$Path\v9.0.0"
+                    }
+                }
+                Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
+                    [PSCustomObject]@{
+                        Name = 'node.exe'
+                        VersionInfo = [PSCustomObject]@{
+                            ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
+                        }
+                    }
                 }
 
                 $versions = Get-NodeVersions
@@ -24,10 +37,22 @@ Describe "Get-NodeVersions" {
                 Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
-                    $ret = @()
-                    $ret += @{ Name = 'v8.9.0' }
-                    $ret += @{ Name = 'v9.0.0' }
-                    return $ret
+                    [PSCustomObject]@{
+                        Name = 'v8.9.0'
+                        Path = "$Path\v8.9.0"
+                    }
+                    [PSCustomObject]@{
+                        Name = 'v9.0.0'
+                        Path = "$Path\v9.0.0"
+                    }
+                }
+                Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
+                    [PSCustomObject]@{
+                        Name = 'node.exe'
+                        VersionInfo = [PSCustomObject]@{
+                            ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
+                        }
+                    }
                 }
 
                 $versions = Get-NodeVersions -Filter 'v8.9.0'
@@ -160,6 +185,10 @@ Describe "Install-NodeVersion" {
             It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
             }
+
+            It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
+            }
         }
 
         Context "Major version installing" {
@@ -186,6 +215,33 @@ Describe "Install-NodeVersion" {
 
                 $versions = Get-NodeVersions
                 $versions.GetType() | Should -Be 'SemVer.Version'
+            }
+        }
+
+        Context "Incomplete installation" {
+            Mock Get-Command -ParameterFilter { $Name -match 'node' -or $Name -match 'npm' } {
+                throw (
+                    "The term '$Name' is not recognized as the name of a cmdlet, function, script file, or " +
+                    "operable program. Check the spelling of the name, or if a path was included, verify that " +
+                    "the path is correct and try again."
+                )
+            }
+
+            It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion latest } | Should -Throw
+            }
+        }
+
+        Context "MSI error" {
+            Mock Start-Process -ParameterFilter { $FilePath -match 'msiexec' } {
+                [PSCustomObject]@{
+                    ExitCode = 1602
+                }
+                throw "The path exceeds the character limit"
+            }
+
+            It "Will error if the msi fails to install" -Skip:($env:include_integration_tests -ne $true) {
+                { Install-NodeVersion latest } | Should -Throw
             }
         }
     }
@@ -321,6 +377,37 @@ Describe "Set-NodeVersion" {
                 Mock Test-Path { return $true } -ParameterFilter { $Path.StartsWith((Join-Path $tmpDir '.nvm')) -eq $true }
             }
         }
+
+        Context "pipeline" {
+            $nodeVersion = "v9.0.0"
+            Mock Test-Path -ParameterFilter { $Path -match 'vs'} { return $true }
+            Mock Get-ChildItem {
+                [PSCustomObject]@{
+                    Name = 'v9.0.0'
+                    Path = "$Path\v9.0.0"
+                }
+            }
+            Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
+                [PSCustomObject]@{
+                    Name = 'node.exe'
+                    VersionInfo = [PSCustomObject]@{
+                        ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
+                    }
+                }
+            }
+            It "Will set from the supplied version via Install-NodeVersion pipeline output" {
+                [PSCustomObject]@{
+                    Name = 'node.exe'
+                    Version = '9.0.0.0'
+                } | Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
+            }
+
+            It "Will set from the supplied version via Get-NodeVersion pipeline output" {
+                [SemVer.Version]::new($nodeVersion, $true) | Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
+            }
+        }
     }
     AfterEach {
         $settingsFile = Join-Path $PSScriptRoot 'settings.json'
@@ -342,6 +429,34 @@ Describe "Remove-NodeVersion" {
             Remove-NodeVersion 'v9.0.0'
 
             Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+        }
+
+        It "Should remove multiple versions" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            Mock Get-NodeInstallLocation { return $tmpDir }
+            Mock Test-Path { return $true }
+            Mock Remove-Item { }
+
+            Remove-NodeVersion 'v9.0.0', 'v10.0.0'
+
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v10.0.0') }
+        }
+
+        It "Should remove versions passed from the pipeline" {
+            $tmpDir = [system.io.path]::GetTempPath()
+            Mock Get-NodeInstallLocation { return $tmpDir }
+            Mock Test-Path { return $true }
+            Mock Remove-Item { }
+            Mock Get-NodeVersions { 
+                'v9.0.0'
+                'v10.0.0'
+            }
+
+            Get-NodeVersions | Remove-NodeVersion
+
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v10.0.0') }
         }
 
         It "Should throw when version doesn't exist" {
