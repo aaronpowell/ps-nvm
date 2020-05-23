@@ -1,0 +1,33 @@
+name: Docs Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.0.0
+
+      - name: Install dependencies
+        run: |
+          cd .scripts
+          dotnet publish -o ..
+
+      - name: Check that documentation was regenerated if needed
+        run: |
+          .scripts/Generate-Documentation.ps1
+          git diff --exit-code .docs/reference.md
+        shell: pwsh
