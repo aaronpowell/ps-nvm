@@ -20,7 +20,7 @@ Describe "Get-NodeVersions" {
                 }
                 Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
                     [PSCustomObject]@{
-                        Name = 'node.exe'
+                        Name        = 'node.exe'
                         VersionInfo = [PSCustomObject]@{
                             ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                         }
@@ -48,7 +48,7 @@ Describe "Get-NodeVersions" {
                 }
                 Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
                     [PSCustomObject]@{
-                        Name = 'node.exe'
+                        Name        = 'node.exe'
                         VersionInfo = [PSCustomObject]@{
                             ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                         }
@@ -154,14 +154,14 @@ Describe "Install-NodeVersion" {
                     } | ConvertTo-Json
                 }
 
-                { Install-NodeVersion } | Should Throw
+ { Install-NodeVersion } | Should Throw
             }
 
             It "Will error if no version, no .nvmrc and no package.json" -Skip:($env:include_integration_tests -ne $true) {
                 Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
                 Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $false }
 
-                { Install-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
+ { Install-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
             }
         }
 
@@ -175,19 +175,19 @@ Describe "Install-NodeVersion" {
 
             It "Throws when version already exists" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'v9.0.0'
-                { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
+ { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
             }
 
             It "Won't throw when version already exists if you use the -Force flag" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
+ { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
             }
 
             It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
+ { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
             }
 
             It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
+ { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
             }
         }
 
@@ -228,19 +228,6 @@ Describe "Install-NodeVersion" {
             }
 
             It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion latest } | Should -Throw
-            }
-        }
-
-        Context "MSI error" {
-            Mock Start-Process -ParameterFilter { $FilePath -match 'msiexec' } {
-                [PSCustomObject]@{
-                    ExitCode = 1602
-                }
-                throw "The path exceeds the character limit"
-            }
-
-            It "Will error if the msi fails to install" -Skip:($env:include_integration_tests -ne $true) {
                 { Install-NodeVersion latest } | Should -Throw
             }
         }
@@ -310,7 +297,7 @@ Describe "Set-NodeVersion" {
                     } | ConvertTo-Json
                 }
 
-                { Set-NodeVersion } | Should Throw
+ { Set-NodeVersion } | Should Throw
             }
 
             It "Will error if no version, no .nvmrc and no package.json" {
@@ -319,7 +306,7 @@ Describe "Set-NodeVersion" {
                 }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
-                { Set-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
+ { Set-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
             }
         }
 
@@ -346,7 +333,7 @@ Describe "Set-NodeVersion" {
             }
 
             It "Will throw error on unmatched version range" {
-                {
+ {
                     Mock Get-NodeVersions { return @() }
 
                     Set-NodeVersion 'v7'
@@ -380,7 +367,7 @@ Describe "Set-NodeVersion" {
 
         Context "pipeline" {
             $nodeVersion = "v9.0.0"
-            Mock Test-Path -ParameterFilter { $Path -match 'vs'} { return $true }
+            Mock Test-Path -ParameterFilter { $Path -match 'vs' } { return $true }
             Mock Get-ChildItem {
                 [PSCustomObject]@{
                     Name = 'v9.0.0'
@@ -389,7 +376,7 @@ Describe "Set-NodeVersion" {
             }
             Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
                 [PSCustomObject]@{
-                    Name = 'node.exe'
+                    Name        = 'node.exe'
                     VersionInfo = [PSCustomObject]@{
                         ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
                     }
@@ -397,7 +384,7 @@ Describe "Set-NodeVersion" {
             }
             It "Will set from the supplied version via Install-NodeVersion pipeline output" {
                 [PSCustomObject]@{
-                    Name = 'node.exe'
+                    Name    = 'node.exe'
                     Version = '9.0.0.0'
                 } | Set-NodeVersion -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
@@ -448,7 +435,7 @@ Describe "Remove-NodeVersion" {
             Mock Get-NodeInstallLocation { return $tmpDir }
             Mock Test-Path { return $true }
             Mock Remove-Item { }
-            Mock Get-NodeVersions { 
+            Mock Get-NodeVersions {
                 'v9.0.0'
                 'v10.0.0'
             }
@@ -466,7 +453,7 @@ Describe "Remove-NodeVersion" {
             Mock Remove-Item { }
 
             $version = 'v9.0.0'
-            { Remove-NodeVersion $version } | Should -Throw "Could not find node version $version"
+ { Remove-NodeVersion $version } | Should -Throw "Could not find node version $version"
         }
     }
 }
