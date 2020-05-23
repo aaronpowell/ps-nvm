@@ -3,8 +3,9 @@
 [![powershellgallery](https://img.shields.io/powershellgallery/v/nvm.svg)](https://www.powershellgallery.com/packages/nvm)
 [![downloads](https://img.shields.io/powershellgallery/dt/nvm.svg?label=downloads)](https://www.powershellgallery.com/packages/nvm)
 [![codecov](https://codecov.io/gh/aaronpowell/ps-nvm/branch/master/graph/badge.svg)](https://codecov.io/gh/aaronpowell/ps-nvm)
-[![windows build](https://img.shields.io/appveyor/ci/aaronpowell/ps-nvm/master.svg?label=windows+build)](https://ci.appveyor.com/project/aaronpowell/ps-nvm)
-[![macos/linux build](https://img.shields.io/travis/aaronpowell/ps-nvm/master.svg?label=macos/linux+build)](https://travis-ci.org/aaronpowell/ps-nvm)
+[![Docs Build](https://github.com/aaronpowell/ps-nvm/workflows/Docs%20Build/badge.svg)](https://github.com/aaronpowell/ps-nvm/actions?query=workflow%3A%22Docs+Build%22)
+[![Build](https://github.com/aaronpowell/ps-nvm/workflows/Build/badge.svg)](https://github.com/aaronpowell/ps-nvm/actions?query=workflow%3ABuild)
+[![Release](https://github.com/aaronpowell/ps-nvm/workflows/Release/badge.svg)](https://github.com/aaronpowell/ps-nvm/actions?query=workflow%3ARelease)
 
 This is a simple PowerShell module for installing and using multiple Node.js versions in PowerShell. This is inspired by [creationix's nvm](https://github.com/creationix/nvm) tool for bash.
 
