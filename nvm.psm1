@@ -148,19 +148,17 @@ function Set-NodeVersion {
         # NOTE: it's important to use uppercase PATH for Unix systems as env vars
         # are case-sensitive on Unix but case-insensitive on Windows
         $env:PATH = @($binPath, $nonNvmPath) -join $separator
-        $env:NPM_CONFIG_GLOBALCONFIG=(Join-Path $binPath npmrc)
+        $env:NPM_CONFIG_GLOBALCONFIG = (Join-Path $binPath npmrc)
 
         # make the path persistent (only on windows)
         if ($Persist -ne '') {
-            if (-not ((IsMac) -or (IsLinux)))
-            {
+            if (-not ((IsMac) -or (IsLinux))) {
                 $originalPath = [Environment]::GetEnvironmentVariable('PATH', $Persist)
                 $cleanedPath = ($originalPath -split $separator | Where-Object { -not $_.StartsWith($nvmPath) }) -join $separator
                 [Environment]::SetEnvironmentVariable('PATH', (@($binPath, $cleanedPath) -join $separator), $Persist)
                 [Environment]::SetEnvironmentVariable('NPM_CONFIG_GLOBALCONFIG', (Join-Path $binPath npmrc), $Persist)
             }
-            else
-            {
+            else {
                 # ignore this request on linux and mac
             }
         }
@@ -324,7 +322,7 @@ function Install-NodeVersion {
         $ProgressPreference = $CurrentProgressPreference
 
         # Make the unpack directory short to comply with Windows's 260 character path limit
-        $unpackPath = Join-Path $env:SystemDrive ".nu-$matchedVersion"
+        $unpackPath = Join-Path $versionPath '.u'
         Remove-Item $unpackPath -Force -Recurse -ErrorAction SilentlyContinue
         New-Item $unpackPath -ItemType Directory | Out-Null
 
@@ -334,6 +332,10 @@ function Install-NodeVersion {
             tar -zxf $outFile --directory $unpackPath --strip=1
             Remove-Item -Force $outFile
             Move-Item (Join-Path $unpackPath '*') -Destination $versionPath -Force
+
+            # Ensure installation actually completed
+            Get-Command (Join-Path (Join-Path $versionPath 'bin') 'node')
+
         }
         elseif (IsWindows) {
             if (-Not (Get-Command msiexec)) {
@@ -356,15 +358,14 @@ function Install-NodeVersion {
             }
 
             Move-Item (Join-Path (Join-Path $unpackPath 'nodejs') '*') -Destination $versionPath -Force
-        }
 
-        # Ensure installation actually completed
-        Get-Command ( Join-Path $versionPath 'node' )
+            # Ensure installation actually completed
+            Get-Command (Join-Path $versionPath 'node.exe')
+        }
 
         Set-Content -Value "prefix=$versionPath" -Path (Join-Path $versionPath npmrc)
 
         Remove-Item $unpackPath -Recurse -Force
-        Remove-Item ( Join-Path $env:SystemDrive '.nu-*' ) -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -450,11 +451,8 @@ function Get-NodeVersions {
     else {
         $nvmPath = Get-NodeInstallLocation
 
-        if ( Test-Path -Path $nvmPath ) {
-            $localVersions = ( Get-ChildItem $nvmPath | Get-ChildItem -Filter 'node.*' ).VersionInfo.ProductVersion
-            foreach ($version in $localVersions) {
-                [SemVer.Version]::new("v$version", $true)
-            }
+        if (Test-Path -Path $nvmPath) {
+            Get-ChildItem $nvmPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
 
