@@ -154,14 +154,16 @@ Describe "Install-NodeVersion" {
                     } | ConvertTo-Json
                 }
 
- { Install-NodeVersion } | Should Throw
+                { Install-NodeVersion } | Should Throw
             }
 
-            It "Will error if no version, no .nvmrc and no package.json" -Skip:($env:include_integration_tests -ne $true) {
+            It "Will error if no version, no .nvmrc and no package.json, no default" -Skip:($env:include_integration_tests -ne $true) {
+                Mock Get-NodeInstallLocation { return "/" }
+                Mock Test-Path -ParameterFilter { $Path -eq '/default' } { return $false }
                 Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
                 Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $false }
 
- { Install-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
+                { Install-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
             }
         }
 
@@ -175,19 +177,19 @@ Describe "Install-NodeVersion" {
 
             It "Throws when version already exists" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'v9.0.0'
- { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
+                { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
             }
 
             It "Won't throw when version already exists if you use the -Force flag" -Skip:($env:include_integration_tests -ne $true) {
- { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
+                { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
             }
 
             It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
- { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
+                { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
             }
 
             It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
- { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
+                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
             }
         }
 
@@ -228,7 +230,7 @@ Describe "Install-NodeVersion" {
             }
 
             It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
- { Install-NodeVersion latest } | Should -Throw
+                { Install-NodeVersion latest } | Should -Throw
             }
         }
     }
@@ -287,6 +289,18 @@ Describe "Set-NodeVersion" {
                 $infos | Should -Be "Switched to node version v9.1.0"
             }
 
+            It "Will set from the default file" {
+                $tmpDir = [system.io.path]::GetTempPath()
+                $nvmDir = Join-Path $tmpDir '.nvm'
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
+                Mock Get-Content -ParameterFilter { $Path -match 'default$' } { return $nodeVersion }
+                Mock Get-NodeInstallLocation { return $nvmDir }
+
+                Set-NodeVersion -InformationVariable infos
+                $infos | Should -Be "Switched to node version $nodeVersion"
+            }
+
             It "Will error if no version in the package.json field" {
                 Mock Test-Path -ParameterFilter { $Path.StartsWith('variable') -eq $false } {
                     return (-not ($Path -match '\.nvmrc$'))
@@ -298,16 +312,16 @@ Describe "Set-NodeVersion" {
                     } | ConvertTo-Json
                 }
 
- { Set-NodeVersion } | Should Throw
+                { Set-NodeVersion } | Should Throw
             }
 
-            It "Will error if no version, no .nvmrc and no package.json" {
-                Mock Test-Path -ParameterFilter { $Path.Contains('.nvmrc') } {
-                    return $false
-                }
+            It "Will error if no version, no .nvmrc and no package.json, no default" {
+                Mock Get-NodeInstallLocation { return "/" }
+                Mock Test-Path { return $false } -ParameterFilter { $Path -eq '/default' }
+                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
- { Set-NodeVersion } | Should Throw "Version not given and no .nvmrc or package.json found in folder"
+                { Set-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
             }
         }
 

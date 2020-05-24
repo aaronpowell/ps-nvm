@@ -159,11 +159,35 @@ function Set-NodeVersion {
                 [Environment]::SetEnvironmentVariable('NPM_CONFIG_GLOBALCONFIG', (Join-Path $binPath npmrc), $Persist)
             }
             else {
-                # ignore this request on linux and mac
+                Add-NvmToProfile $Version $Persist
             }
         }
 
         Write-Information "Switched to node version $matchedVersion"
+    }
+}
+
+function Add-NvmToProfile {
+    param(
+        [string]
+        $Version,
+        [ValidateSet('User', 'Machine')]
+        $Scope
+    )
+
+    # Write default version number
+    $vsDefault = Join-Path (Get-NodeInstallLocation) "default"
+    $Version | Set-Content $vsDefault
+
+    # Add command to profile script
+    $targetProfile = $Profile.CurrentUserCurrentHost
+    if ($Scope -eq 'Machine') {
+        $targetProfile = $Profile.AllUsersCurrentHost
+    }
+
+    $profileSrc = if (Test-Path $targetProfile) { Get-Content $targetProfile } else { "" }
+    if (!($profileSrc.Contains("Set-NodeVersion"))) {
+        "`n# nvm`nSet-NodeVersion" | Add-Content $targetProfile
     }
 }
 
@@ -452,7 +476,7 @@ function Get-NodeVersions {
         $nvmPath = Get-NodeInstallLocation
 
         if (Test-Path -Path $nvmPath) {
-            Get-ChildItem $nvmPath | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
+            Get-ChildItem $nvmPath -Attributes Directory | ForEach-Object { [SemVer.Version]::new($_.Name, $true) }
         }
     }
 
