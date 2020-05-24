@@ -25,10 +25,10 @@ None
 #### Examples
 
 ```powershell
-
+Get-NodeInstallLocation
 ```
 
-
+    
 ### `Get-NodeVersions`
 <a id="get-nodeversions"></a>
 
@@ -73,11 +73,11 @@ Return the installed versions as strings
 Download and install the specified version of node.js into the nvm directory. Once installed it can be used with Set-NodeVersion
 
 ```powershell
-Install-NodeVersion -Version <String> -Force <SwitchParameter> -Architecture <String> -Proxy <String>
+Install-NodeVersion -Version <String[]> -Force <SwitchParameter> -Architecture <String> -Proxy <String>
 ```
 
 #### Parameters
-- `-Version <String>`  
+- `-Version <String[]>`  
   A semver range for the version of node.js to install
  - `-Force <SwitchParameter>`  
   Reinstall an already installed version of node.js
@@ -93,6 +93,13 @@ Install-NodeVersion -Version <String> -Force <SwitchParameter> -Architecture <St
 ```powershell
 Install-NodeVersion v5.0.0
 Install version 5.0.0 of node.js into the module directory
+```
+
+    
+ 
+```powershell
+Install-NodeVersion v5.0.0, v6.0.0
+Installs versions 5.0.0 and 6.0.0 of node.js into the module directory
 ```
 
     
@@ -123,11 +130,11 @@ Installs the x86 version even if you're on an x64 machine using default CNTLM pr
 Removes an installed version of node.js along with any installed npm modules
 
 ```powershell
-Remove-NodeVersion -Version <String>
+Remove-NodeVersion -Version <String[]>
 ```
 
 #### Parameters
-- `-Version <String>`  
+- `-Version <String[]>`  
   The full version string of the node.js package to remove
 
 
@@ -137,6 +144,13 @@ Remove-NodeVersion -Version <String>
 ```powershell
 Remove-NodeVersion v5.0.0
 Removes the v5.0.0 version of node.js from the nvm store
+```
+
+    
+ 
+```powershell
+Get-NodeVersions | Remove-NodeVersion
+Remove ALL versions of node.js from the nvm store
 ```
 
     
@@ -168,12 +182,14 @@ Set-NodeInstallLocation -Path C:\Temp
 Set's the node.js version that was either provided with the -Version parameter, from using the .nvmrc file or the node engines field in package.json in the current working directory.
 
 ```powershell
-Set-NodeVersion -Version <String> -Persist <String>
+Set-NodeVersion -Version <String> -SemVer <Version> -Persist <String>
 ```
 
 #### Parameters
 - `-Version <String>`  
   A semver version range for the node.js version you wish to use.
+ - `-SemVer <Version>`  
+  A SemVer object returned from Get-NodeVersions.
  - `-Persist <String>`  
   If present, this will also set the node.js version to the permanent system path, of the specified scope, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell.
 
@@ -217,15 +233,22 @@ Sets to the latest installed version between v5 and v7
     
  
 ```powershell
+Get-NodeVersions '>=5.0.0 <7.0.0' | Set-NodeVersion
+Sets to the latest installed version between v5 and v7 that's actually installed
+```
+
+    
+ 
+```powershell
 Set-NodeVersion v5.0.1 -Persist User
-Set and persist in permamant system path for the current user
+Set and persist in permanent system path for the current user
 ```
 
     
  
 ```powershell
 Set-NodeVersion v5.0.1 -Persist Machine
-Set and persist in permamant system path for the machine (Note: requires an admin shell)
+Set and persist in permanent system path for the machine (Note: requires an admin shell)
 ```
 
     
