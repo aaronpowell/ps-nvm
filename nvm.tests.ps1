@@ -228,13 +228,14 @@ Describe "Install-NodeVersion" {
             }
 
             It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion latest } | Should -Throw
+ { Install-NodeVersion latest } | Should -Throw
             }
         }
     }
 
     BeforeEach {
-        $installLocation = Join-Path ([system.io.path]::GetTempPath()) '.nvm'
+        $basePath = if ($IsWindows) { $env:SystemDrive } else { [system.io.path]::GetTempPath() }
+        $installLocation = Join-Path $basePath '.nvm'
         Set-NodeInstallLocation -Path $installLocation
     }
 
