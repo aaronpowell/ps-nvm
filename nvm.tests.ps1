@@ -317,7 +317,7 @@ Describe "Set-NodeVersion" {
 
             It "Will error if no version, no .nvmrc and no package.json, no default" {
                 Mock Get-NodeInstallLocation { return "/" }
-                Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('default') }
+                Mock Test-Path { return $false } -ParameterFilter { $Path -eq (Join-Path (Get-NodeInstallLocation) 'default') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
