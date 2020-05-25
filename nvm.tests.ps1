@@ -163,7 +163,7 @@ Describe "Install-NodeVersion" {
                 Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
                 Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $false }
 
-                { Install-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
+                { Install-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
             }
         }
 
@@ -321,7 +321,7 @@ Describe "Set-NodeVersion" {
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
-                { Set-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder and package.json does not contain node engines field"
+                { Set-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
             }
         }
 
@@ -400,7 +400,7 @@ Describe "Set-NodeVersion" {
             It "Will set from the supplied version via Install-NodeVersion pipeline output" {
                 [PSCustomObject]@{
                     Name    = 'node.exe'
-                    Version = '9.0.0.0'
+                    Version = '9.0.0'
                 } | Set-NodeVersion -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
