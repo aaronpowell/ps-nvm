@@ -8,3 +8,4 @@ bin/
 *.dll
 *.pdb
 *.deps.json
+.ionide
