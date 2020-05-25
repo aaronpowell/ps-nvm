@@ -68,6 +68,8 @@ jobs:
           path: nvm
 
       - name: Publish to PowerShell Gallery
+        env:
+          POWERSHELL_GALLERY: ${{ secrets.POWERSHELL_GALLERY }}
         run: |
           Publish-Module -Path (Get-Location) -NuGetApiKey $env:POWERSHELL_GALLERY -Force
         working-directory: nvm
