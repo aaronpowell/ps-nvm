@@ -93,19 +93,23 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags       = 'nodejs'
+            Tags         = 'nodejs'
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/aaronpowell/ps-nvm/blob/master/License.md'
+            LicenseUri   = 'https://github.com/aaronpowell/ps-nvm/blob/master/License.md'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/aaronpowell/ps-nvm'
+            ProjectUri   = 'https://github.com/aaronpowell/ps-nvm'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Improve Install/Remove-NodeVersion.'
+            ReleaseNotes = '
+            - Support to persist version on non-Windows (Mac/Linux).
+            - Changes to Install/Select version that has better semver support
+            - Ability to install multiple versions at once
+            - Migration to GitHub Actions for CI/CD'
 
             # External dependent modules of this module
             # ExternalModuleDependencies = ''
