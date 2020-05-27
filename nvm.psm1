@@ -356,14 +356,14 @@ function Install-NodeVersion {
                 throw "msiexec is not in your path"
             }
 
-            $args = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"")
+            $argumentList = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"")
 
             # Make sure to catch any errors since Start-Process doesn't throw based on the process ExitCode
             $result = Start-Process `
                 -FilePath "msiexec.exe" `
                 -Wait `
                 -PassThru `
-                -ArgumentList $args `
+                -ArgumentList $argumentList `
                 -RedirectStandardError "$env:TEMP\stderr.log"
             if ($result.ExitCode -ne 0) {
                 $errMsg = "ExitCode $($result.ExitCode): $(Get-Content "$env:TEMP\stderr.log")"
