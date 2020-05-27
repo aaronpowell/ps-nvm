@@ -76,7 +76,7 @@
     VariablesToExport      = @()
 
     # Aliases to export from this module
-    AliasesToExport        = @()
+    AliasesToExport        = @("Get-NodeVersion")
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()

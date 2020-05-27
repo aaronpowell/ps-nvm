@@ -474,6 +474,8 @@ function Get-NodeVersions {
     $versions | Where-Object { $range.IsSatisfied($_) } | Sort-Object -Descending -Property Major, Minor, Patch, PreRelease, Build
 }
 
+Set-Alias Get-NodeVersion Get-NodeVersions
+
 function Set-NodeInstallLocation {
     <#
     .Synopsis
@@ -534,3 +536,5 @@ function Get-NodeInstallLocation {
 
     $settings.InstallPath
 }
+
+Export-ModuleMember -Alias @(Get-NodeVersion)
