@@ -130,12 +130,16 @@ Installs the x86 version even if you're on an x64 machine using default CNTLM pr
 Removes an installed version of node.js along with any installed npm modules
 
 ```powershell
-Remove-NodeVersion -Version <String[]>
+Remove-NodeVersion -Version <String[]> -WhatIf <SwitchParameter> -Confirm <SwitchParameter>
 ```
 
 #### Parameters
 - `-Version <String[]>`  
   The full version string of the node.js package to remove
+ - `-WhatIf <SwitchParameter>`  
+  
+ - `-Confirm <SwitchParameter>`  
+  
 
 
 
@@ -160,12 +164,16 @@ Remove ALL versions of node.js from the nvm store
 This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
 
 ```powershell
-Set-NodeInstallLocation -Path <String>
+Set-NodeInstallLocation -Path <String> -WhatIf <SwitchParameter> -Confirm <SwitchParameter>
 ```
 
 #### Parameters
 - `-Path <String>`  
   The root folder for nvm
+ - `-WhatIf <SwitchParameter>`  
+  
+ - `-Confirm <SwitchParameter>`  
+  
 
 
 
@@ -182,7 +190,7 @@ Set-NodeInstallLocation -Path C:\Temp
 Set's the node.js version that was either provided with the -Version parameter, from using the .nvmrc file or the node engines field in package.json in the current working directory.
 
 ```powershell
-Set-NodeVersion -Version <String> -SemVer <Version> -Persist <String>
+Set-NodeVersion -Version <String> -SemVer <Version> -Persist <String> -WhatIf <SwitchParameter> -Confirm <SwitchParameter>
 ```
 
 #### Parameters
@@ -192,6 +200,10 @@ Set-NodeVersion -Version <String> -SemVer <Version> -Persist <String>
   A SemVer object returned from Get-NodeVersions.
  - `-Persist <String>`  
   If present, this will also set the node.js version to the permanent system path, of the specified scope, which will persist this setting for future powershell sessions and causes this version of node.js to be referenced outside of powershell.
+ - `-WhatIf <SwitchParameter>`  
+  
+ - `-Confirm <SwitchParameter>`  
+  
 
 
 
