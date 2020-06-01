@@ -115,7 +115,9 @@ Describe "Get-NodeInstallLocation" {
 Describe "Install-NodeVersion" {
     InModuleScope nvm {
         Context "auto-discovery" {
-            $nodeVersion = 'v9.0.0'
+            BeforeEach {
+                $nodeVersion = 'v9.0.0'
+            }
 
             It "Install version from the .nvmrc file" -Skip:($env:include_integration_tests -ne $true) {
                 Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $true }
@@ -154,7 +156,7 @@ Describe "Install-NodeVersion" {
                     } | ConvertTo-Json
                 }
 
-                { Install-NodeVersion } | Should Throw
+                { Install-NodeVersion } | Should -Throw
             }
 
             It "Will error if no version, no .nvmrc and no package.json, no default" -Skip:($env:include_integration_tests -ne $true) {
@@ -163,7 +165,7 @@ Describe "Install-NodeVersion" {
                 Mock Test-Path -ParameterFilter { $Path -match '.nvmrc$' } { return $false }
                 Mock Test-Path -ParameterFilter { $Path -match 'package.json$' } { return $false }
 
-                { Install-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
+                { Install-NodeVersion } | Should -Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
             }
         }
 
@@ -177,19 +179,19 @@ Describe "Install-NodeVersion" {
 
             It "Throws when version already exists" -Skip:($env:include_integration_tests -ne $true) {
                 Install-NodeVersion -Version 'v9.0.0'
-                { Install-NodeVersion -Version 'v9.0.0' } | Should Throw
+                { Install-NodeVersion -Version 'v9.0.0' } | Should -Throw
             }
 
             It "Won't throw when version already exists if you use the -Force flag" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version 'v9.0.0' -Force } | Should Not Throw
+                { Install-NodeVersion -Version 'v9.0.0' -Force } | Should -Not -Throw
             }
 
             It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '9.0.0' -Force } | Should Not Throw
+                { Install-NodeVersion -Version '9.0.0' -Force } | Should -Not -Throw
             }
 
             It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should Not Throw
+                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should -Not -Throw
             }
         }
 
@@ -221,12 +223,14 @@ Describe "Install-NodeVersion" {
         }
 
         Context "Incomplete installation" {
-            Mock Get-Command -ParameterFilter { $Name -match 'node' -or $Name -match 'npm' } {
-                throw (
-                    "The term '$Name' is not recognized as the name of a cmdlet, function, script file, or " +
-                    "operable program. Check the spelling of the name, or if a path was included, verify that " +
-                    "the path is correct and try again."
-                )
+            BeforeEach {
+                Mock Get-Command -ParameterFilter { $Name -match 'node' -or $Name -match 'npm' } {
+                    throw (
+                        "The term '$Name' is not recognized as the name of a cmdlet, function, script file, or " +
+                        "operable program. Check the spelling of the name, or if a path was included, verify that " +
+                        "the path is correct and try again."
+                    )
+                }
             }
 
             It "Will error if node or npm can't be called" -Skip:($env:include_integration_tests -ne $true) {
@@ -256,8 +260,10 @@ Describe "Install-NodeVersion" {
 
 Describe "Set-NodeVersion" {
     InModuleScope nvm {
-        Context "auto-discovery" {
+        BeforeEach {
             $nodeVersion = 'v9.0.0'
+        }
+        Context "auto-discovery" {
 
             It "Will set from the .nvmrc file" {
                 $tmpDir = [system.io.path]::GetTempPath()
@@ -294,6 +300,7 @@ Describe "Set-NodeVersion" {
                 $nvmDir = Join-Path $tmpDir '.nvm'
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
+                Mock Test-Path { return $true } -ParameterFilter { $Path.Contains((Join-Path $nvmDir 'default')) }
                 Mock Get-Content -ParameterFilter { $Path -match 'default$' } { return $nodeVersion }
                 Mock Get-NodeInstallLocation { return $nvmDir }
 
@@ -312,7 +319,7 @@ Describe "Set-NodeVersion" {
                     } | ConvertTo-Json
                 }
 
-                { Set-NodeVersion } | Should Throw
+                { Set-NodeVersion } | Should -Throw
             }
 
             It "Will error if no version, no .nvmrc and no package.json, no default" {
@@ -321,13 +328,11 @@ Describe "Set-NodeVersion" {
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('.nvmrc') }
                 Mock Test-Path { return $false } -ParameterFilter { $Path.Contains('./package.json') }
 
-                { Set-NodeVersion } | Should Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
+                { Set-NodeVersion } | Should -Throw "Version not given, no .nvmrc found in folder, and package.json missing or does not contain node engines field"
             }
         }
 
         Context "Set from version string" {
-            $nodeVersion = 'v9.0.0'
-
             It "Will set from the supplied version" {
                 Set-NodeVersion $nodeVersion -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
@@ -348,7 +353,7 @@ Describe "Set-NodeVersion" {
             }
 
             It "Will throw error on unmatched version range" {
- {
+                {
                     Mock Get-NodeVersions { return @() }
 
                     Set-NodeVersion 'v7'
@@ -359,7 +364,7 @@ Describe "Set-NodeVersion" {
                 Mock Get-NodeVersions { return @('v9.0.0') }
 
                 Set-NodeVersion 'v9' -InformationVariable infos
-                $env:NPM_CONFIG_GLOBALCONFIG | Should -not -Be $null
+                $env:NPM_CONFIG_GLOBALCONFIG | Should -Not -Be $null
             }
 
             It "Will update environment path" {
@@ -381,19 +386,21 @@ Describe "Set-NodeVersion" {
         }
 
         Context "pipeline" {
-            $nodeVersion = "v9.0.0"
-            Mock Test-Path -ParameterFilter { $Path -match 'vs' } { return $true }
-            Mock Get-ChildItem {
-                [PSCustomObject]@{
-                    Name = 'v9.0.0'
-                    Path = "$Path\v9.0.0"
+            BeforeEach {
+                $nodeVersion = "v9.0.0"
+                Mock Test-Path -ParameterFilter { $Path -match 'vs' } { return $true }
+                Mock Get-ChildItem {
+                    [PSCustomObject]@{
+                        Name = 'v9.0.0'
+                        Path = "$Path\v9.0.0"
+                    }
                 }
-            }
-            Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
-                [PSCustomObject]@{
-                    Name        = 'node.exe'
-                    VersionInfo = [PSCustomObject]@{
-                        ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
+                Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
+                    [PSCustomObject]@{
+                        Name        = 'node.exe'
+                        VersionInfo = [PSCustomObject]@{
+                            ProductVersion = ( Split-Path -Path $Path -Leaf ).Replace('v', '')
+                        }
                     }
                 }
             }

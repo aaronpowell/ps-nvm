@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          Install-Module -Force -Scope CurrentUser Pester, PSCodeCovIo
+          Install-Module -Force -Scope CurrentUser Pester -MaximumVersion '5.99.99'
           cd .scripts
           dotnet publish -o ..
         shell: pwsh
@@ -33,8 +33,7 @@ jobs:
         env:
           include_integration_tests: true
         run: |
-          $res = Invoke-Pester -PassThru -CodeCoverage nvm.psm1;
-          Export-CodeCovIoJson -CodeCoverage $res.CodeCoverage -RepoRoot $pwd -Path coverage.json;
+          $res = Invoke-Pester -CI -PassThru
           if ($res.FailedCount -gt 0) {
             throw "$($res.FailedCount) tests failed."
           }
