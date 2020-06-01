@@ -9,3 +9,4 @@ bin/
 *.pdb
 *.deps.json
 .ionide
+testResults.xml
