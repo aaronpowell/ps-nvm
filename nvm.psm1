@@ -239,7 +239,7 @@ function Install-NodeVersion {
         $Force,
 
         [string]
-        [ValidateSet('Arm', 'Arm64', 'X64', 'X86', 'AMD64')]
+        [ValidateSet('Arm', 'Arm64', 'ArmV7L', 'X64', 'X86', 'AMD64')]
         $Architecture,
 
         [string]
@@ -263,6 +263,13 @@ function Install-NodeVersion {
             }
             else {
                 $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+
+                if (Get-Command -Name uname -ErrorAction SilentlyContinue) {
+                    # Architecture may be reported as Arm but might be Armv7L
+                    if ((uname -a) -match 'armv7l') {
+                        $Architecture = 'ArmV7L'
+                    }
+                }
             }
         }
 

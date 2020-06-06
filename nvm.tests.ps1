@@ -222,6 +222,30 @@ Describe "Install-NodeVersion" {
             }
         }
 
+        Context "Installing on an ArmV7L system" {
+            It "Can detect if the system architecture is ArmV7L" -Skip:(($env:include_integration_tests -ne $true) -or (-not $IsLinux)) {
+                { Install-NodeVersion -Version '9.0.0' } | Should -Not -Throw
+            }
+
+            BeforeEach {
+                function uname {
+                    Param([switch]$a)
+                    
+                    if ($a) {
+                        return "Linux fake-raspberrypi 4.19.57-v7l+ #1244 SMP Thu Jul 4 18:48:07 BST 2019 armv7l GNU/Linux"
+                    } else {
+                        return "Linux"
+                    }
+                }
+            }
+
+            AfterEach {
+                if (Test-Path Function:uname) {
+                    Remove-Item -Path Function:uname
+                }
+            }
+        }
+
         Context "Incomplete installation" {
             BeforeEach {
                 Mock Get-Command -ParameterFilter { $Name -match 'node' -or $Name -match 'npm' } {
