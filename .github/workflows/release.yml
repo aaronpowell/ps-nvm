@@ -13,12 +13,12 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 2.0.0
+          dotnet-version: '6.0.x'
 
       - name: Install dependencies
         run: |
@@ -38,7 +38,7 @@ jobs:
         shell: pwsh
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
 
       - name: Prepare Artifacts
         run: |
@@ -49,7 +49,7 @@ jobs:
           cp autocomplete-utils.ps1 nvm
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         if: ${{ matrix.os }} == 'ubuntu-latest'
         with:
           name: nvm
@@ -61,7 +61,7 @@ jobs:
     needs: [build]
     steps:
       - name: Download package
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: nvm
           path: nvm
@@ -80,7 +80,7 @@ jobs:
     needs: [build]
     steps:
       - name: Download package
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: nvm
           path: nvm
