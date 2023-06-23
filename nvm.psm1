@@ -371,15 +371,17 @@ function Install-NodeVersion {
                 throw $errMsg
             }
 
-            # build expected path to nodejs
-            $expectedPath = Join-Path $unpackPath 'nodejs'
+            $possiblePaths = @('PFiles64/nodejs', 'PFiles/nodejs', 'nodejs')
+            $expectedPath = $null
+            foreach ($path in $possiblePaths) {
+                $expectedPath = Join-Path $unpackPath $path
+                if (Test-Path $expectedPath) {
+                    break
+                }
+            }
 
             if (-Not (Test-Path $expectedPath)) {
-                $expectedPath = Join-Path (Join-Path $unpackPath 'PFiles64') 'nodejs'
-
-                if (-Not (Test-Path $expectedPath)) {
-                    throw "Could not find nodejs install path"
-                }
+                throw "Could not find nodejs install path"
             }
 
             Move-Item (Join-Path ($expectedPath) '*') -Destination $versionPath -Force
