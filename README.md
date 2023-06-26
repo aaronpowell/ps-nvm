@@ -36,7 +36,7 @@ Install-NodeVersion
 
 ### Semver ranges
 
-ps-nvm works with [semver ranges as used by npm](https://docs.npmjs.com/misc/semver#ranges).
+ps-nvm works with [semver ranges as used by npm](https://docs.npmjs.com/cli/v6/using-npm/semver#ranges).
 For example, you can pass `^6.0.0` or just `6` to `Install-NodeVersion` to install the latest 6.x.x version, or even `>=6.0.0 <9.0.0` to install the latest version between v6 and v7.
 Versions returned are [`SemVer.Version` objects](https://github.com/adamreeve/semver.net#readme) that can be compared with comparison operators like `-gt` and `-lt`.
 
