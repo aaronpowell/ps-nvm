@@ -81,7 +81,7 @@ function Set-NodeVersion {
 
     $Version = Get-TargetNodeVersion($Version).Trim()
 
-    $matchedVersion = if (!($Version -match "v\d+\.\d+\.\d+")) {
+    $matchedVersion = if (!($Version -match "^v\d+\.\d+\.\d+$")) {
         Get-NodeVersions -Filter $Version | Select-Object -First 1
     }
     else {
