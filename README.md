@@ -56,6 +56,10 @@ cd .scripts
 dotnet publish -o ..
 cd ..
 
+# Run linting
+Install-Module PSScriptAnalyzer
+Invoke-ScriptAnalyzer ./
+
 # Run tests
 Install-Module Pester
 Invoke-Pester

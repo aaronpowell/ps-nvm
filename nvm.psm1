@@ -60,8 +60,8 @@ function Set-NodeVersion {
         Set and persist in permanent system path for the machine (Note: requires an admin shell)
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md/blob/master/.docs/reference.md#set-nodeversion
-    #>
-    [CmdletBinding(DefaultParameterSetName = 'String')]
+#>
+    [CmdletBinding(DefaultParameterSetName = 'String', SupportsShouldProcess)]
     param(
         [string]
         [Parameter(ParameterSetName = 'String', Position = 0, ValueFromPipelineByPropertyName = $true)]
@@ -131,7 +131,7 @@ function Set-NodeVersion {
     $env:NPM_CONFIG_GLOBALCONFIG = (Join-Path $binPath npmrc)
 
     # make the path persistent (only on windows)
-    if ($Persist -ne '') {
+    if ($Persist -ne '' -and $PSCmdlet.ShouldProcess($Version, 'Persist this Node.js version')) {
         if (-not ((IsMac) -or (IsLinux))) {
             $originalPath = [Environment]::GetEnvironmentVariable('PATH', $Persist)
             $cleanedPath = ($originalPath -split $separator | Where-Object { -not $_.StartsWith($nvmPath) }) -join $separator
@@ -356,14 +356,14 @@ function Install-NodeVersion {
                 throw "msiexec is not in your path"
             }
 
-            $args = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"")
+            $argumentList = @("/a", "`"$outFile`"", "/qb", "TARGETDIR=`"$unpackPath`"")
 
             # Make sure to catch any errors since Start-Process doesn't throw based on the process ExitCode
             $result = Start-Process `
                 -FilePath "msiexec.exe" `
                 -Wait `
                 -PassThru `
-                -ArgumentList $args `
+                -ArgumentList $argumentList `
                 -RedirectStandardError "$env:TEMP\stderr.log"
             if ($result.ExitCode -ne 0) {
                 $errMsg = "ExitCode $($result.ExitCode): $(Get-Content "$env:TEMP\stderr.log")"
@@ -413,7 +413,7 @@ function Remove-NodeVersion {
     .Link
         https://github.com/aaronpowell/ps-nvm/blob/master/.docs/reference.md#get-nodeversion
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [string[]]
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -430,8 +430,9 @@ function Remove-NodeVersion {
             if (!(Test-Path -Path $requestedVersion)) {
                 throw "Could not find node version $versionNumber"
             }
-
-            Remove-Item $requestedVersion -Force -Recurse
+            if ($PSCmdlet.ShouldProcess($requestedVersion, 'Remove Node.js version from installed versions')) {
+                Remove-Item $requestedVersion -Force -Recurse
+            }
         }
     }
 }
@@ -497,7 +498,7 @@ function Set-NodeInstallLocation {
     .Example
         C:\PS> Set-NodeInstallLocation -Path C:\Temp
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [string]
         [Parameter(Mandatory = $true)]
@@ -516,7 +517,9 @@ function Set-NodeInstallLocation {
 
     $settings.InstallPath = Join-Path $Path '.nvm'
 
-    ConvertTo-Json $settings | Out-File (Join-Path $PSScriptRoot 'settings.json')
+    if ($PSCmdlet.ShouldProcess($Path, 'Set the Node.js install location')) {
+        ConvertTo-Json $settings | Out-File (Join-Path $PSScriptRoot 'settings.json')
+    }
 }
 
 function Get-NodeInstallLocation {
