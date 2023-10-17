@@ -507,7 +507,7 @@ function Set-NodeInstallLocation {
     .Example
         C:\PS> Set-NodeInstallLocation -Path C:\Temp
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [string]
         [Parameter(Mandatory = $true)]
@@ -515,17 +515,23 @@ function Set-NodeInstallLocation {
         $Path
     )
 
+    $installPath = Join-Path $Path '.nvm'
+
+    if (!$PSCmdlet.ShouldProcess("Path: ${installPath}", "Set Node install location")) {
+        return
+    }
+
     $settings = $null
     $settingsFile = Join-Path $PSScriptRoot 'settings.json'
 
     if ((Test-Path $settingsFile) -eq $true) {
         $settings = Get-Content $settingsFile | ConvertFrom-Json
+        $settings.InstallPath = $installPath
     }
     else {
-        $settings = @{ 'InstallPath' = Get-NodeInstallLocation }
+        $settings = @{ 'InstallPath' = $installPath }
     }
 
-    $settings.InstallPath = Join-Path $Path '.nvm'
 
     ConvertTo-Json $settings | Out-File (Join-Path $PSScriptRoot 'settings.json')
 }
