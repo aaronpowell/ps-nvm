@@ -22,6 +22,16 @@ function IsWindows() {
     return (Test-Path variable:global:IsWindows) -and $IsWindows
 }
 
+function IsAbsolutePath([string] $Path) {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        # PowerShell 5.x doesn't have IsPathFullyQualified.
+        # IsPathRooted is the best we can do here.
+        return [IO.Path]::IsPathRooted($Path)
+    }
+
+    return [IO.Path]::IsPathFullyQualified($Path)
+}
+
 function Set-NodeVersion {
     <#
     .Synopsis
@@ -493,7 +503,7 @@ function Set-NodeInstallLocation {
     .Description
         This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
     .Parameter Path
-        The root folder for nvm
+        The root folder for nvm.  Path must be absolute.
     .Example
         C:\PS> Set-NodeInstallLocation -Path C:\Temp
     #>
@@ -501,6 +511,7 @@ function Set-NodeInstallLocation {
     param(
         [string]
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ IsAbsolutePath($_) })]
         $Path
     )
 
