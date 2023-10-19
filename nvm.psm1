@@ -504,6 +504,10 @@ function Set-NodeInstallLocation {
         This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
     .Parameter Path
         The root folder for nvm.  Path must be absolute.
+    .Parameter Confirm
+        Prompts you for confirmation before running the cmdlet.
+    .Parameter WhatIf
+        Shows what would happen if the cmdlet runs. The cmdlet is not run.
     .Example
         C:\PS> Set-NodeInstallLocation -Path C:\Temp
     #>
