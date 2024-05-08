@@ -142,8 +142,8 @@ Describe "Install-NodeVersion" {
 
                 Install-NodeVersion
 
-                $versions = Get-NodeVersions -Filter 'v9.*'
-                $versions | Should -BeLike 'v9.*'
+                $versions = Get-NodeVersions -Filter 'v22.*'
+                $versions | Should -BeLike 'v22.*'
             }
 
             It "Will error if no version in the package.json field" -Skip:($env:include_integration_tests -ne $true) {
@@ -197,19 +197,19 @@ Describe "Install-NodeVersion" {
 
         Context "Major version installing" {
             It "Can install from just a major version" -Skip:($env:include_integration_tests -ne $true) {
-                Install-NodeVersion -Version '9'
+                Install-NodeVersion -Version '22'
 
-                $versions = Get-NodeVersions -Filter 'v9'
-                $versions | Should -Match 'v9'
+                $versions = Get-NodeVersions -Filter 'v22'
+                $versions | Should -Match 'v22'
             }
         }
 
         Context "Major and minor version installing" {
             It "Can install from just a major and minor version" -Skip:($env:include_integration_tests -ne $true) {
-                Install-NodeVersion -Version '9.0'
+                Install-NodeVersion -Version '22.0'
 
-                $versions = Get-NodeVersions -Filter 'v9.0'
-                $versions | Should -Match 'v9.0'
+                $versions = Get-NodeVersions -Filter 'v22.0'
+                $versions | Should -Match 'v22.0'
             }
         }
 
