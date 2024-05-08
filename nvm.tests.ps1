@@ -191,7 +191,7 @@ Describe "Install-NodeVersion" {
             }
 
             It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '10.0.0', '11.0.0' } | Should -Not -Throw
+                { Install-NodeVersion -Version '22.1.0', '20.13.0' } | Should -Not -Throw
             }
         }
 
