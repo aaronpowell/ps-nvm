@@ -160,12 +160,16 @@ Remove ALL versions of node.js from the nvm store
 This is used to override the default node.js install path for nvm, which is relative to the module install location. You would want to use this to get around the Windows path limit problem that plagues node.js installed. Note that to avoid collisions the unpacked files will be in a folder `.nvm\<version>` in the specified location.
 
 ```powershell
-Set-NodeInstallLocation -Path <String>
+Set-NodeInstallLocation -Path <String> -WhatIf <SwitchParameter> -Confirm <SwitchParameter>
 ```
 
 #### Parameters
 - `-Path <String>`  
-  The root folder for nvm
+  The root folder for nvm.  Path must be absolute.
+ - `-WhatIf <SwitchParameter>`  
+  Shows what would happen if the cmdlet runs. The cmdlet is not run.
+ - `-Confirm <SwitchParameter>`  
+  Prompts you for confirmation before running the cmdlet.
 
 
 
