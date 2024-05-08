@@ -91,7 +91,7 @@ Describe "Get-NodeVersions" {
 
                 Mock Invoke-WebRequest { return $mockJson }
 
-                $versions = Get-NodeVersions -Remote -Filter "v8"
+                $versions = Get-NodeVersions -Remote -Filter "v20"
                 $versions.Count | Should -Be 2
             }
         }
