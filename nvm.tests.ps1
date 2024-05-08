@@ -10,12 +10,12 @@ Describe "Get-NodeVersions" {
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
                     [PSCustomObject]@{
-                        Name = 'v8.9.0'
-                        Path = "$Path\v8.9.0"
+                        Name = 'v20.13.0'
+                        Path = "$Path\v20.13.0"
                     }
                     [PSCustomObject]@{
-                        Name = 'v9.0.0'
-                        Path = "$Path\v9.0.0"
+                        Name = 'v22.1.0'
+                        Path = "$Path\v22.1.0"
                     }
                 }
                 Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
@@ -29,7 +29,7 @@ Describe "Get-NodeVersions" {
 
                 $versions = Get-NodeVersions
                 $versions.Count | Should -Be 2
-                $versions | Should -Be @('v9.0.0'; 'v8.9.0')
+                $versions | Should -Be @('v22.1.0'; 'v20.13.0')
             }
 
             It "Gets known versions with filter" {
@@ -38,12 +38,12 @@ Describe "Get-NodeVersions" {
                 Mock Test-Path { return $true }
                 Mock Get-ChildItem {
                     [PSCustomObject]@{
-                        Name = 'v8.9.0'
-                        Path = "$Path\v8.9.0"
+                        Name = 'v20.13.0'
+                        Path = "$Path\v20.13.0"
                     }
                     [PSCustomObject]@{
-                        Name = 'v9.0.0'
-                        Path = "$Path\v9.0.0"
+                        Name = 'v22.1.0'
+                        Path = "$Path\v22.1.0"
                     }
                 }
                 Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
@@ -55,8 +55,8 @@ Describe "Get-NodeVersions" {
                     }
                 }
 
-                $versions = Get-NodeVersions -Filter 'v8.9.0'
-                $versions | Should -Be 'v8.9.0'
+                $versions = Get-NodeVersions -Filter 'v20.13.0'
+                $versions | Should -Be 'v20.13.0'
 
             }
 
@@ -64,15 +64,15 @@ Describe "Get-NodeVersions" {
                 $tmpDir = [system.io.path]::GetTempPath()
                 Mock Get-NodeInstallLocation { Join-Path $tmpDir '.nvm\settings.json' }
                 Mock Test-Path { return $false }
-                Get-NodeVersions -Filter 'v8.9.0' | Should -BeNullOrEmpty
+                Get-NodeVersions -Filter 'v20.13.0' | Should -BeNullOrEmpty
             }
         }
 
         Context "Remote versions" {
             It "Will list remote versions" {
                 $mockJson = "[
-                    {""version"":""v9.0.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.2.414.32"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""59"",""lts"":false},
-                    {""version"":""v8.9.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.1.534.46"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""57"",""lts"":""Carbon""},
+                    {""version"":""v22.1.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.2.414.32"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""59"",""lts"":false},
+                    {""version"":""v20.13.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.1.534.46"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""57"",""lts"":""Carbon""},
                     {""version"":""v8.8.1"",""date"":""2017-10-25"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.4.2"",""v8"":""6.1.534.42"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""57"",""lts"":false}
                 ]"
 
@@ -84,8 +84,8 @@ Describe "Get-NodeVersions" {
 
             It "Will list remote versions with filter" {
                 $mockJson = "[
-                    {""version"":""v9.0.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.2.414.32"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""59"",""lts"":false},
-                    {""version"":""v8.9.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.1.534.46"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""57"",""lts"":""Carbon""},
+                    {""version"":""v22.1.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.2.414.32"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""59"",""lts"":false},
+                    {""version"":""v20.13.0"",""date"":""2017-10-31"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.5.1"",""v8"":""6.1.534.46"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""57"",""lts"":""Carbon""},
                     {""version"":""v8.8.1"",""date"":""2017-10-25"",""files"":[""aix-ppc64"",""headers"",""linux-arm64"",""linux-armv6l"",""linux-armv7l"",""linux-ppc64le"",""linux-x64"",""linux-x86"",""osx-x64-pkg"",""osx-x64-tar"",""src"",""sunos-x64"",""sunos-x86"",""win-x64-7z"",""win-x64-exe"",""win-x64-msi"",""win-x64-zip"",""win-x86-7z"",""win-x86-exe"",""win-x86-msi"",""win-x86-zip""],""npm"":""5.4.2"",""v8"":""6.1.534.42"",""uv"":""1.15.0"",""zlib"":""1.2.11"",""openssl"":""1.0.2l"",""modules"":""57"",""lts"":false}
                 ]"
 
@@ -116,7 +116,7 @@ Describe "Install-NodeVersion" {
     InModuleScope nvm {
         Context "auto-discovery" {
             BeforeEach {
-                $nodeVersion = 'v9.0.0'
+                $nodeVersion = 'v22.1.0'
             }
 
             It "Install version from the .nvmrc file" -Skip:($env:include_integration_tests -ne $true) {
@@ -125,8 +125,8 @@ Describe "Install-NodeVersion" {
 
                 Install-NodeVersion
 
-                $versions = Get-NodeVersions -Filter 'v9.0.0'
-                $versions | Should -Be 'v9.0.0'
+                $versions = Get-NodeVersions -Filter 'v22.1.0'
+                $versions | Should -Be 'v22.1.0'
             }
 
             It "Install version from the package.json field" -Skip:($env:include_integration_tests -ne $true) {
@@ -135,7 +135,7 @@ Describe "Install-NodeVersion" {
                 Mock Get-Content -ParameterFilter { $Path -match 'package.json$' } {
                     return @{
                         engines = @{
-                            node = '^9.0.0'
+                            node = '^22.1.0'
                         }
                     } | ConvertTo-Json
                 }
@@ -171,23 +171,23 @@ Describe "Install-NodeVersion" {
 
         Context "Installing with a specific version" {
             It "Install a requested version" -Skip:($env:include_integration_tests -ne $true) {
-                Install-NodeVersion -Version 'v9.0.0'
+                Install-NodeVersion -Version 'v22.1.0'
 
-                $versions = Get-NodeVersions -Filter 'v9.0.0'
-                $versions | Should -Be 'v9.0.0'
+                $versions = Get-NodeVersions -Filter 'v22.1.0'
+                $versions | Should -Be 'v22.1.0'
             }
 
             It "Throws when version already exists" -Skip:($env:include_integration_tests -ne $true) {
-                Install-NodeVersion -Version 'v9.0.0'
-                { Install-NodeVersion -Version 'v9.0.0' } | Should -Throw
+                Install-NodeVersion -Version 'v22.1.0'
+                { Install-NodeVersion -Version 'v22.1.0' } | Should -Throw
             }
 
             It "Won't throw when version already exists if you use the -Force flag" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version 'v9.0.0' -Force } | Should -Not -Throw
+                { Install-NodeVersion -Version 'v22.1.0' -Force } | Should -Not -Throw
             }
 
             It "Can install without a 'v' prefix" -Skip:($env:include_integration_tests -ne $true) {
-                { Install-NodeVersion -Version '9.0.0' -Force } | Should -Not -Throw
+                { Install-NodeVersion -Version '22.1.0' -Force } | Should -Not -Throw
             }
 
             It "Can install multiple versions" -Skip:($env:include_integration_tests -ne $true) {
@@ -261,7 +261,7 @@ Describe "Install-NodeVersion" {
 Describe "Set-NodeVersion" {
     InModuleScope nvm {
         BeforeEach {
-            $nodeVersion = 'v9.0.0'
+            $nodeVersion = 'v22.1.0'
         }
         Context "auto-discovery" {
 
@@ -284,7 +284,7 @@ Describe "Set-NodeVersion" {
                 Mock Get-Content -ParameterFilter { $Path -match 'package.json$' } {
                     return @{
                         engines = @{
-                            node = '^9.0.0'
+                            node = '^22.1.0'
                         }
                     } | ConvertTo-Json
                 }
@@ -339,16 +339,16 @@ Describe "Set-NodeVersion" {
             }
 
             It "Will set from a version range" {
-                Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
+                Mock Get-NodeVersions { return @('v22.1.0'; 'v20.13.0') }
 
                 Set-NodeVersion 'v9' -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
             It "Will set from a version range with caret" {
-                Mock Get-NodeVersions { return @('v9.0.0'; 'v8.9.0') }
+                Mock Get-NodeVersions { return @('v22.1.0'; 'v20.13.0') }
 
-                Set-NodeVersion '^9.0.0' -InformationVariable infos
+                Set-NodeVersion '^22.1.0' -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
 
@@ -361,7 +361,7 @@ Describe "Set-NodeVersion" {
             }
 
             It "Will set npm config path" {
-                Mock Get-NodeVersions { return @('v9.0.0') }
+                Mock Get-NodeVersions { return @('v22.1.0') }
 
                 Set-NodeVersion 'v9' -InformationVariable infos
                 $env:NPM_CONFIG_GLOBALCONFIG | Should -Not -Be $null
@@ -370,7 +370,7 @@ Describe "Set-NodeVersion" {
             It "Will update environment path" {
                 $explicitVersion = "v9.32.99"
                 $nvmPath = Get-NodeInstallLocation
-                Set-NodeVersion -Version 'v9.0.0' -InformationVariable infos
+                Set-NodeVersion -Version 'v22.1.0' -InformationVariable infos
                 Set-NodeVersion -Version $explicitVersion -InformationVariable infos
                 $separator = [System.IO.Path]::PathSeparator
                 [System.String[]]$nvmPaths = ($env:PATH -split $separator) | Where-Object { $_.StartsWith($nvmPath) }
@@ -387,12 +387,12 @@ Describe "Set-NodeVersion" {
 
         Context "pipeline" {
             BeforeEach {
-                $nodeVersion = "v9.0.0"
+                $nodeVersion = "v22.1.0"
                 Mock Test-Path -ParameterFilter { $Path -match 'vs' } { return $true }
                 Mock Get-ChildItem {
                     [PSCustomObject]@{
-                        Name = 'v9.0.0'
-                        Path = "$Path\v9.0.0"
+                        Name = 'v22.1.0'
+                        Path = "$Path\v22.1.0"
                     }
                 }
                 Mock Get-ChildItem -ParameterFilter { $Filter -match 'node' } {
@@ -407,7 +407,7 @@ Describe "Set-NodeVersion" {
             It "Will set from the supplied version via Install-NodeVersion pipeline output" {
                 [PSCustomObject]@{
                     Name    = 'node.exe'
-                    Version = '9.0.0'
+                    Version = '22.1.0'
                 } | Set-NodeVersion -InformationVariable infos
                 $infos | Should -Be "Switched to node version $nodeVersion"
             }
@@ -435,9 +435,9 @@ Describe "Remove-NodeVersion" {
             Mock Test-Path { return $true }
             Mock Remove-Item { }
 
-            Remove-NodeVersion 'v9.0.0'
+            Remove-NodeVersion 'v22.1.0'
 
-            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v22.1.0') }
         }
 
         It "Should remove multiple versions" {
@@ -446,9 +446,9 @@ Describe "Remove-NodeVersion" {
             Mock Test-Path { return $true }
             Mock Remove-Item { }
 
-            Remove-NodeVersion 'v9.0.0', 'v10.0.0'
+            Remove-NodeVersion 'v22.1.0', 'v10.0.0'
 
-            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v22.1.0') }
             Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v10.0.0') }
         }
 
@@ -458,13 +458,13 @@ Describe "Remove-NodeVersion" {
             Mock Test-Path { return $true }
             Mock Remove-Item { }
             Mock Get-NodeVersions {
-                'v9.0.0'
+                'v22.1.0'
                 'v10.0.0'
             }
 
             Get-NodeVersions | Remove-NodeVersion
 
-            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v9.0.0') }
+            Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v22.1.0') }
             Assert-MockCalled -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq (Join-Path $tmpDir 'v10.0.0') }
         }
 
@@ -474,8 +474,8 @@ Describe "Remove-NodeVersion" {
             Mock Test-Path { return $false }
             Mock Remove-Item { }
 
-            $version = 'v9.0.0'
- { Remove-NodeVersion $version } | Should -Throw "Could not find node version $version"
+            $version = 'v22.1.0'
+            { Remove-NodeVersion $version } | Should -Throw "Could not find node version $version"
         }
     }
 }
