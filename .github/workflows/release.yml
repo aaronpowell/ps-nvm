@@ -103,7 +103,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: |
-          gh release create "${{ github.ref_name }}" .\nvm\nvm.zip `
+          gh release create "${{ github.ref_name }}" ./nvm/nvm.zip `
             --repo "${{ github.repository }}" `
             --title "Release ${{ github.ref_name }}" `
             --notes "Latest release of PowerShell nvm"
