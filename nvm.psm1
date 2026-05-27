@@ -32,6 +32,28 @@ function IsAbsolutePath([string] $Path) {
     return [IO.Path]::IsPathFullyQualified($Path)
 }
 
+function Resolve-WindowsNodeInstallPathFromMsi([string] $UnpackPath) {
+    $possiblePaths = @('PFiles64/nodejs', 'PFiles/nodejs', 'nodejs')
+    foreach ($path in $possiblePaths) {
+        $candidatePath = Join-Path $UnpackPath $path
+        if (Test-Path (Join-Path $candidatePath 'node.exe')) {
+            return $candidatePath
+        }
+    }
+
+    $candidates = @(Get-ChildItem -Path $UnpackPath -Filter 'node.exe' -File -Recurse | ForEach-Object { $_.DirectoryName } | Select-Object -Unique)
+    if ($candidates.Count -eq 0) {
+        throw "Could not find nodejs install path"
+    }
+
+    $preferredCandidate = $candidates | Where-Object { Test-Path (Join-Path $_ 'npm.cmd') } | Select-Object -First 1
+    if ($null -ne $preferredCandidate) {
+        return $preferredCandidate
+    }
+
+    return ($candidates | Select-Object -First 1)
+}
+
 function Set-NodeVersion {
     <#
     .Synopsis
@@ -381,18 +403,7 @@ function Install-NodeVersion {
                 throw $errMsg
             }
 
-            $possiblePaths = @('PFiles64/nodejs', 'PFiles/nodejs', 'nodejs')
-            $expectedPath = $null
-            foreach ($path in $possiblePaths) {
-                $expectedPath = Join-Path $unpackPath $path
-                if (Test-Path $expectedPath) {
-                    break
-                }
-            }
-
-            if (-Not (Test-Path $expectedPath)) {
-                throw "Could not find nodejs install path"
-            }
+            $expectedPath = Resolve-WindowsNodeInstallPathFromMsi -UnpackPath $unpackPath
 
             Move-Item (Join-Path ($expectedPath) '*') -Destination $versionPath -Force
 
