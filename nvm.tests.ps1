@@ -112,6 +112,51 @@ Describe "Get-NodeInstallLocation" {
     }
 }
 
+Describe "Resolve-WindowsNodeInstallPathFromMsi" {
+    InModuleScope nvm {
+        It "Finds legacy expected install path" {
+            $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
+            $nodeDir = Join-Path $tmpDir 'PFiles64\nodejs'
+            New-Item -Path $nodeDir -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $nodeDir 'node.exe') -ItemType File | Out-Null
+
+            try {
+                Resolve-WindowsNodeInstallPathFromMsi -UnpackPath $tmpDir | Should -Be $nodeDir
+            }
+            finally {
+                Remove-Item $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Falls back to locating node.exe recursively for new layouts" {
+            $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
+            $nodeDir = Join-Path $tmpDir 'Files\node-runtime'
+            New-Item -Path $nodeDir -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $nodeDir 'node.exe') -ItemType File | Out-Null
+            New-Item -Path (Join-Path $nodeDir 'npm.cmd') -ItemType File | Out-Null
+
+            try {
+                Resolve-WindowsNodeInstallPathFromMsi -UnpackPath $tmpDir | Should -Be $nodeDir
+            }
+            finally {
+                Remove-Item $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Throws when node.exe cannot be found" {
+            $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
+            New-Item -Path $tmpDir -ItemType Directory -Force | Out-Null
+
+            try {
+                { Resolve-WindowsNodeInstallPathFromMsi -UnpackPath $tmpDir } | Should -Throw "Could not find nodejs install path"
+            }
+            finally {
+                Remove-Item $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+}
+
 Describe "Install-NodeVersion" {
     InModuleScope nvm {
         Context "auto-discovery" {
