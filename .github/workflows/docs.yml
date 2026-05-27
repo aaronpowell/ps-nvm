@@ -9,25 +9,29 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v3
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Install dependencies
+        shell: pwsh
         run: |
-          cd .scripts
+          Set-Location .scripts
           dotnet publish -o ..
 
       - name: Check that documentation was regenerated if needed
         run: |
-          .scripts/Generate-Documentation.ps1
+          .\.scripts\Generate-Documentation.ps1
           git diff --exit-code .docs/reference.md
         shell: pwsh

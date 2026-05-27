@@ -5,25 +5,32 @@ on:
     tags:
       - "*"
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v3
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Install dependencies
         run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
           Install-Module -Force -Scope CurrentUser Pester -MaximumVersion '5.99.99'
-          cd .scripts
+          Set-Location .scripts
           dotnet publish -o ..
         shell: pwsh
 
@@ -38,19 +45,23 @@ jobs:
         shell: pwsh
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
 
       - name: Prepare Artifacts
+        shell: pwsh
         run: |
-          mkdir nvm
-          cp nvm.* nvm
-          cp SemVer.dll nvm
-          cp *.md nvm
-          cp autocomplete-utils.ps1 nvm
+          New-Item -Path nvm -ItemType Directory -Force | Out-Null
+          Copy-Item nvm.* nvm
+          Copy-Item SemVer.dll nvm
+          Copy-Item *.md nvm
+          Copy-Item autocomplete-utils.ps1 nvm
+          Compress-Archive -Path nvm\* -DestinationPath nvm\nvm.zip -Force
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
-        if: ${{ matrix.os }} == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-latest'
         with:
           name: nvm
           path: ./nvm
@@ -61,7 +72,7 @@ jobs:
     needs: [build]
     steps:
       - name: Download package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nvm
           path: nvm
@@ -77,39 +88,22 @@ jobs:
   release_github:
     name: Release to GitHub
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: [build]
     steps:
       - name: Download package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nvm
           path: nvm
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Latest release of PowerShell nvm
-          draft: false
-          prerelease: false
-
-      - name: Create zip
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
         run: |
-          zip nvm *
-        working-directory: nvm
-
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./nvm/nvm.zip
-          asset_name: nvm.zip
-          asset_content_type: application/zip
+          gh release create "${{ github.ref_name }}" .\nvm\nvm.zip `
+            --repo "${{ github.repository }}" `
+            --title "Release ${{ github.ref_name }}" `
+            --notes "Latest release of PowerShell nvm"
